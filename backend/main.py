@@ -43,8 +43,8 @@ class ChatRequest(BaseModel):
     user_id:            str
     session_id:         Optional[str] = None
     selected_hospital:  Optional[str] = None
-    user_lat:           Optional[float] = None  # ADD THIS
-    user_lon:           Optional[float] = None  # ADD THIS  # hospital_id after user selects
+    user_lat:           Optional[float] = None
+    user_lon:           Optional[float] = None
 
 class RegisterRequest(BaseModel):
     user_id:                  str
@@ -139,7 +139,7 @@ async def save_financials(req: FinancialsRequest):
         raise HTTPException(status_code=500, detail="Failed to save financials")
 
     return {
-        "success":          True,
+        "success":           True,
         "max_loan_eligible": financials["max_loan_eligible"],
         "foir_headroom":     financials["foir_headroom"],
     }
@@ -150,12 +150,12 @@ async def save_financials(req: FinancialsRequest):
 
 @app.post("/api/documents/upload")
 async def upload_document(
-    user_id:  str      = Form(...),
-    doc_type: str      = Form(...),   # salary_slip / itr / balance_sheet / insurance
+    user_id:  str        = Form(...),
+    doc_type: str        = Form(...),   # salary_slip / itr / balance_sheet / insurance
     file:     UploadFile = File(...),
 ):
     """
-    Upload financial document.
+    Upload financial document (PDF, JPG, PNG, WEBP).
     Gemini reads it and extracts key financial data.
     """
     contents = await file.read()
@@ -183,14 +183,35 @@ async def upload_document(
         Return ONLY JSON. No explanation.
         """
 
-        # For PDF documents
-        if file.filename.endswith(".pdf"):
+        # Detect file type and send accordingly
+        filename = file.filename.lower()
+
+        if filename.endswith(".pdf"):
             response = gemini.generate_content([
                 {"mime_type": "application/pdf", "data": b64},
                 extract_prompt
             ])
+        elif filename.endswith(".png"):
+            response = gemini.generate_content([
+                {"mime_type": "image/png", "data": b64},
+                extract_prompt
+            ])
+        elif filename.endswith((".jpg", ".jpeg")):
+            response = gemini.generate_content([
+                {"mime_type": "image/jpeg", "data": b64},
+                extract_prompt
+            ])
+        elif filename.endswith(".webp"):
+            response = gemini.generate_content([
+                {"mime_type": "image/webp", "data": b64},
+                extract_prompt
+            ])
         else:
-            response = gemini.generate_content(extract_prompt)
+            return {
+                "success":   False,
+                "extracted": {},
+                "message":   "Unsupported file type. Please upload PDF, JPG, PNG, or WEBP."
+            }
 
         raw = response.text.strip()
         if raw.startswith("```"):
@@ -218,9 +239,9 @@ async def upload_document(
     except Exception as e:
         print(f"❌ Document extraction error: {e}")
         return {
-            "success": True,
+            "success":   True,
             "extracted": {},
-            "message": "Document saved. Manual extraction may be needed."
+            "message":   "Document saved. Manual extraction may be needed."
         }
 
 
