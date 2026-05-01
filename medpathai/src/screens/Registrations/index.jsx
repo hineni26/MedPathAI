@@ -11,7 +11,7 @@ import { registerUser, getProfile } from '../../api/registration'
 import { saveFinancials } from '../../api/financials'
 import { useUserStore } from '../../store/userStore'
 import { useUIStore } from '../../store/uiStore'
-import { getUserId, markRegistered, isRegistered } from '../../api/auth'
+import { getUserId, markRegistered, isRegistered, setUserId as persistUserId } from '../../api/auth'
 
 const STEPS = [
   { label: 'Profile' },
@@ -23,7 +23,7 @@ const STEPS = [
 
 const EMPTY_FORM = {
   // Step 1
-  name: '', age: '', gender: '', city: '', blood_group: '',
+  name: '', email: '', password: '', age: '', gender: '', city: '', blood_group: '',
   // Step 2
   comorbidities: [],
   // Step 3
@@ -39,6 +39,7 @@ export default function Registration() {
   const navigate   = useNavigate()
   const userId     = getUserId()
   const setProfile    = useUserStore((s) => s.setProfile)
+  const setStoreUserId = useUserStore((s) => s.setUserId)
   const setFinancials = useUserStore((s) => s.setFinancials)
   const toast      = useUIStore((s) => s.toast)
 
@@ -76,8 +77,10 @@ export default function Registration() {
     setLoading(true)
     try {
       // 1 — save health profile
-      await registerUser({
+      const registerResult = await registerUser({
         user_id:                 userId,
+        email:                   form.email.trim().toLowerCase(),
+        password:                form.password || undefined,
         name:                    form.name.trim(),
         age:                     Number(form.age),
         gender:                  form.gender,
@@ -91,10 +94,16 @@ export default function Registration() {
         emergency_contact_phone: form.emergency_contact_phone || null,
       })
 
+      const savedUserId = registerResult.user_id || userId
+      if (savedUserId !== userId) {
+        persistUserId(savedUserId)
+        setStoreUserId(savedUserId)
+      }
+
       // 2 — save financials if entered
       if (form.monthly_income) {
         await saveFinancials({
-          user_id:          userId,
+          user_id:          savedUserId,
           employment_type:  form.employment_type || 'salaried',
           monthly_income:   Number(form.monthly_income),
           existing_emi:     Number(form.existing_emi) || 0,
@@ -104,7 +113,7 @@ export default function Registration() {
       }
 
       // 3 — reload profile into store
-      const { profile, financials } = await getProfile(userId)
+      const { profile, financials } = await getProfile(savedUserId)
       setProfile(profile)
       if (financials) setFinancials(financials)
 

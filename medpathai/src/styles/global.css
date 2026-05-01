@@ -23,6 +23,7 @@ body {
   background-color: var(--color-bg-base);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 #root {
@@ -161,6 +162,7 @@ input, textarea, select {
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
+  transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 /* ── Form elements ──────────────────────────────────────── */
@@ -371,4 +373,54 @@ input, textarea, select {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: var(--space-4) 0;
+}
+
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(176, 200, 228, 0.24);
+}
+
+:root[data-theme='dark'] .app-topbar,
+:root[data-theme='dark'] .app-main,
+:root[data-theme='dark'] .app-content {
+  background: var(--color-bg-base);
+}
+
+:root[data-theme='dark'] .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b6c2d1' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+:root[data-theme='dark'] .btn-outline:hover,
+:root[data-theme='dark'] .btn-ghost:hover {
+  background: rgba(176, 200, 228, 0.08);
+}
+
+:root[data-theme='dark'] .btn-navy {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-strong);
+}
+
+:root[data-theme='dark'] .skeleton {
+  background: linear-gradient(90deg, #101827 25%, #1a2b44 50%, #101827 75%);
+  background-size: 400px 100%;
+}
+
+:root[data-theme='dark'] .badge-nabh,
+:root[data-theme='dark'] .badge-metro {
+  background: rgba(23, 176, 167, 0.14);
+  color: var(--teal-200);
+}
+
+:root[data-theme='dark'] .badge-jci {
+  background: rgba(122, 160, 204, 0.16);
+  color: var(--navy-200);
+}
+
+:root[data-theme='dark'] .badge-tier2 {
+  background: rgba(176, 200, 228, 0.12);
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme='dark'] .badge-emergency {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
 }

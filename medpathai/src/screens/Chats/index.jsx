@@ -74,6 +74,7 @@ export default function Chat() {
           messages={messages}
           loading={isLoading}
           providerMode={providerMode}
+          profile={profile}
           selectedHospital={selectedHospital}
           onSelectHospital={handleSelectHospital}
         />

@@ -1,10 +1,12 @@
 import { NavLink, useNavigate } from 'react-router'
-import { UserCircle, FileText, MessageCircle, Activity, LogOut } from 'lucide-react'
+import { UserCircle, FileText, MessageCircle, Activity, LogOut, LogIn, Moon, Sun } from 'lucide-react'
 import { useUserStore } from '../store/userStore'
-import { clearUserId, clearRegistration } from '../api/auth'
+import { clearUserId, clearRegistration, isRegistered } from '../api/auth'
 import { useChatStore } from '../store/chatStore'
+import { useUIStore } from '../store/uiStore'
 
 const NAV = [
+  { to: '/login',    icon: LogIn,         label: 'Login',     end: true  },
   { to: '/register', icon: UserCircle,    label: 'Profile',   end: true  },
   { to: '/documents',icon: FileText,      label: 'Documents', end: false },
   { to: '/chat',     icon: MessageCircle, label: 'Chat',      end: false },
@@ -12,14 +14,20 @@ const NAV = [
 
 export default function Sidebar() {
   const profile  = useUserStore((s) => s.profile)
+  const clearUser = useUserStore((s) => s.clearUser)
   const navigate = useNavigate()
   const clearChat = useChatStore((s) => s.clearChat)
+  const theme = useUIStore((s) => s.theme)
+  const toggleTheme = useUIStore((s) => s.toggleTheme)
+  const loggedIn = isRegistered()
+  const isDark = theme === 'dark'
 
   function handleLogout() {
     clearUserId()
     clearRegistration()
+    clearUser()
     clearChat()
-    navigate('/register')
+    navigate('/login')
   }
 
   return (
@@ -78,7 +86,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav style={{ padding: '8px 12px', flex: 1 }}>
-        {NAV.map(({ to, icon: Icon, label, end }) => (
+        {NAV.filter((item) => loggedIn || item.to === '/login' || item.to === '/register').map(({ to, icon: Icon, label, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -110,6 +118,35 @@ export default function Sidebar() {
         padding: '12px 12px 20px',
         borderTop: '1px solid rgba(255,255,255,0.08)',
       }}>
+        <button
+          onClick={toggleTheme}
+          aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            width: '100%', padding: '10px 12px',
+            borderRadius: 'var(--radius-lg)',
+            color: 'rgba(255,255,255,0.72)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--weight-medium)',
+            transition: 'all var(--transition-fast)',
+            cursor: 'pointer',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            marginBottom: 8,
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.color = '#fff'
+            e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.color = 'rgba(255,255,255,0.72)'
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+          }}
+        >
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          {isDark ? 'Light mode' : 'Dark mode'}
+        </button>
         <button
           onClick={handleLogout}
           style={{

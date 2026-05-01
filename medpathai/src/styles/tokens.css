@@ -7,6 +7,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
 
 :root {
+  color-scheme: light;
+
   /* ── Brand Palette ─────────────────────────────────────── */
   --navy-950: #050d1a;
   --navy-900: #0a1628;
@@ -160,4 +162,81 @@
   --transition-base:   200ms ease;
   --transition-slow:   320ms ease;
   --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --navy-700: #dce8f4;
+  --navy-600: #b0c8e4;
+  --navy-200: #223653;
+  --navy-100: #182942;
+  --navy-50:  #111f33;
+
+  --teal-800: #a0e6e2;
+  --teal-700: #65d5ce;
+  --teal-600: #35c4bb;
+  --teal-100: rgba(23, 176, 167, 0.18);
+  --teal-50:  rgba(23, 176, 167, 0.11);
+
+  --amber-600: #fde68a;
+  --amber-100: rgba(245, 158, 11, 0.17);
+  --amber-50:  rgba(245, 158, 11, 0.11);
+
+  --red-600:   #fca5a5;
+  --red-100:   rgba(239, 68, 68, 0.18);
+  --red-50:    rgba(239, 68, 68, 0.11);
+
+  --green-600: #86efac;
+  --green-100: rgba(34, 197, 94, 0.18);
+  --green-50:  rgba(34, 197, 94, 0.11);
+
+  --gray-600:  #b6c2d1;
+  --gray-400:  #7f8da1;
+  --gray-300:  #3a4c65;
+  --gray-200:  rgba(176, 200, 228, 0.18);
+  --gray-100:  rgba(176, 200, 228, 0.11);
+  --gray-50:   rgba(176, 200, 228, 0.07);
+
+  --color-bg-base:        #07111f;
+  --color-bg-surface:     #0d1a2b;
+  --color-bg-elevated:    #13243a;
+  --color-bg-sidebar:     #050d1a;
+  --color-bg-sidebar-hover: #102040;
+  --color-bg-input:       #111f33;
+  --color-bg-muted:       #101827;
+
+  --color-text-primary:   #f3f7fb;
+  --color-text-secondary: #b6c2d1;
+  --color-text-muted:     #7f8da1;
+  --color-text-inverse:   #07111f;
+  --color-text-accent:    var(--teal-300);
+
+  --color-border:         rgba(176, 200, 228, 0.16);
+  --color-border-focus:   var(--teal-400);
+  --color-border-strong:  rgba(176, 200, 228, 0.28);
+
+  --color-accent:         var(--teal-400);
+  --color-accent-hover:   var(--teal-300);
+  --color-accent-light:   rgba(23, 176, 167, 0.14);
+
+  --color-danger:         #f87171;
+  --color-danger-bg:      rgba(239, 68, 68, 0.13);
+  --color-warning:        #fbbf24;
+  --color-warning-bg:     rgba(245, 158, 11, 0.13);
+  --color-success:        #4ade80;
+  --color-success-bg:     rgba(34, 197, 94, 0.13);
+
+  --color-green-badge-bg:   rgba(34, 197, 94, 0.14);
+  --color-green-badge-text: #86efac;
+  --color-yellow-badge-bg:  rgba(245, 158, 11, 0.15);
+  --color-yellow-badge-text:#fde68a;
+  --color-red-badge-bg:     rgba(239, 68, 68, 0.15);
+  --color-red-badge-text:   #fca5a5;
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.28), 0 0 1px rgba(255,255,255,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.25);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.36), 0 2px 6px rgba(0,0,0,0.26);
+  --shadow-xl: 0 16px 40px rgba(0,0,0,0.42), 0 4px 12px rgba(0,0,0,0.28);
 }

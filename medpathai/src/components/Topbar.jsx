@@ -3,6 +3,7 @@ import { Building2 } from 'lucide-react'
 import { useUIStore } from '../store/uiStore'
 
 const PAGE_TITLES = {
+  '/login':     'Login',
   '/register':  'Health Profile',
   '/documents': 'My Documents',
   '/chat':      'MedPath Chat',

@@ -34,7 +34,11 @@ export default function StepHealthProfile({ form, update, onNext }) {
 
   function validate() {
     const e = {}
+    const isLoggedIn = !!localStorage.getItem('medpath_registered')
     if (!form.name.trim())  e.name   = 'Name is required'
+    if (!form.email.trim()) e.email = 'Email is required'
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = 'Enter a valid email'
+    if (!isLoggedIn && form.password.length < 8) e.password = 'Use at least 8 characters'
     if (!form.age || form.age < 1 || form.age > 120) e.age = 'Enter a valid age'
     if (!form.gender)       e.gender = 'Select a gender'
     if (!form.city)         e.city   = 'Select your city'
@@ -79,6 +83,40 @@ export default function StepHealthProfile({ form, update, onNext }) {
           style={{ borderColor: errors.name ? 'var(--color-danger)' : undefined }}
         />
       )}
+
+      {field('Email', 'email',
+        <input
+          className="form-input"
+          type="email"
+          autoComplete="email"
+          placeholder="e.g. priya@example.com"
+          value={form.email}
+          onChange={(e) => update({ email: e.target.value })}
+          style={{ borderColor: errors.email ? 'var(--color-danger)' : undefined }}
+        />
+      )}
+
+      <div style={{ marginBottom: 'var(--space-5)' }}>
+        <label className="form-label">
+          Password <span style={{ color: 'var(--color-text-muted)', fontWeight: 400, textTransform: 'none' }}>
+            {localStorage.getItem('medpath_registered') ? '(leave blank to keep current)' : ''}
+          </span>
+        </label>
+        <input
+          className="form-input"
+          type="password"
+          autoComplete="new-password"
+          placeholder="At least 8 characters"
+          value={form.password}
+          onChange={(e) => update({ password: e.target.value })}
+          style={{ borderColor: errors.password ? 'var(--color-danger)' : undefined }}
+        />
+        {errors.password && (
+          <p style={{ color: 'var(--color-danger)', fontSize: 'var(--text-xs)', marginTop: 4 }}>
+            {errors.password}
+          </p>
+        )}
+      </div>
 
       {/* Age + Gender row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>

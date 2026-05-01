@@ -18,7 +18,10 @@ export default function CostBreakdown({ cost }) {
     <div className="card" style={{ padding: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <IndianRupee size={16} color="var(--teal-600)" />
-        <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}>Estimated Cost</h3>
+        <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}>
+          Estimated Cost
+          {cost.selected_hospital?.hospital_name ? ` - ${cost.selected_hospital.hospital_name}` : ''}
+        </h3>
       </div>
 
       <div style={{
