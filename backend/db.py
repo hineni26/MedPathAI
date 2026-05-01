@@ -156,6 +156,18 @@ def get_user_profile_by_email(email: str, include_sensitive: bool = False) -> di
 # USER FINANCIALS
 # ══════════════════════════════════════════════════════════════════════════════
 
+def _normalize_cibil_score(value) -> int | None:
+    if value in (None, ""):
+        return None
+
+    try:
+        score = int(value)
+    except (TypeError, ValueError):
+        return None
+
+    return score if 300 <= score <= 900 else None
+
+
 def save_user_financials(user_id: str, financials: dict) -> bool:
     """Save or update extracted financial data."""
     try:
@@ -164,7 +176,7 @@ def save_user_financials(user_id: str, financials: dict) -> bool:
             "monthly_income_inr":    financials.get("monthly_income"),
             "annual_income_inr":     financials.get("annual_income"),
             "income_source":         financials.get("employment_type"),
-            "cibil_score":           financials.get("cibil_score"),
+            "cibil_score":           _normalize_cibil_score(financials.get("cibil_score")),
             "total_emi_inr":         financials.get("existing_emi", 0),
             "foir":                  financials.get("foir_headroom"),
             "max_loan_eligible_inr": financials.get("max_loan_eligible"),
@@ -296,11 +308,11 @@ def get_session(session_id: str) -> dict | None:
             supabase.table("sessions")
             .select("langgraph_state")
             .eq("id", session_id)
-            .single()
+            .limit(1)
             .execute()
         )
-        if res.data and res.data.get("langgraph_state"):
-            return res.data["langgraph_state"]
+        if res.data:
+            return res.data[0].get("langgraph_state")
         return None
     except Exception as e:
         print(f"❌ get_session error: {e}")

@@ -8,6 +8,7 @@ import CostBreakdown from './CostBreakdown'
 import EligibilityResult from './EligibilityResult'
 import PFLLoanPanel from './PFLLoanPanel'
 import ProviderModePanel from './ProviderModePanel'
+import PossibleCauses from './PossibleCauses'
 
 export default function MessageList({ messages, loading, providerMode, profile, selectedHospital, onSelectHospital }) {
   const endRef = useRef(null)
@@ -77,13 +78,23 @@ export default function MessageList({ messages, loading, providerMode, profile, 
 function ResultCards({ data, providerMode, selectedHospital, onSelectHospital }) {
   const [showFinancing, setShowFinancing] = useState(false)
   const selectedHospitalId = selectedHospital?.hospital_id
+  const clinicalSignals = data.clinical_signals || data.possible_causes || []
 
   useEffect(() => {
     setShowFinancing(false)
   }, [selectedHospitalId])
 
   if (data.type === 'clarification') {
-    return null
+    return (
+      <div style={{
+        display: 'grid',
+        gap: 12,
+        margin: '0 0 20px 40px',
+        maxWidth: 820,
+      }}>
+        <PossibleCauses causes={clinicalSignals} />
+      </div>
+    )
   }
 
   const hospitals = data.hospitals || []
@@ -103,6 +114,7 @@ function ResultCards({ data, providerMode, selectedHospital, onSelectHospital })
       margin: '0 0 20px 40px',
       maxWidth: 820,
     }}>
+      <PossibleCauses causes={clinicalSignals} icd10={data.icd10_code} />
       {data.is_emergency && <EmergencyBanner hospitals={hospitals} />}
       {hospitals.length > 0 && (
         <div style={{ display: 'grid', gap: 10 }}>

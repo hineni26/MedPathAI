@@ -21,6 +21,9 @@ const STEPS = [
   { label: 'Emergency' },
 ]
 
+const CIBIL_MIN = 300
+const CIBIL_MAX = 900
+
 const EMPTY_FORM = {
   // Step 1
   name: '', email: '', password: '', age: '', gender: '', city: '', blood_group: '',
@@ -76,6 +79,39 @@ export default function Registration() {
   async function handleFinish() {
     setLoading(true)
     try {
+      let financialPayload = null
+      if (form.monthly_income) {
+        const monthlyIncome = Number(form.monthly_income)
+        const existingEmi = Number(form.existing_emi) || 0
+        const cibilScore = form.cibil_score === '' ? 700 : Number(form.cibil_score)
+        const employmentYears = Number(form.employment_years) || 1
+
+        if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) {
+          throw new Error('Monthly income must be greater than 0')
+        }
+
+        if (!Number.isFinite(existingEmi) || existingEmi < 0) {
+          throw new Error('Existing EMI cannot be negative')
+        }
+
+        if (!Number.isInteger(cibilScore) || cibilScore < CIBIL_MIN || cibilScore > CIBIL_MAX) {
+          throw new Error(`CIBIL score must be between ${CIBIL_MIN} and ${CIBIL_MAX}`)
+        }
+
+        if (!Number.isFinite(employmentYears) || employmentYears < 0) {
+          throw new Error('Years employed cannot be negative')
+        }
+
+        financialPayload = {
+          user_id:          userId,
+          employment_type:  form.employment_type || 'salaried',
+          monthly_income:   monthlyIncome,
+          existing_emi:     existingEmi,
+          cibil_score:      cibilScore,
+          employment_years: employmentYears,
+        }
+      }
+
       // 1 — save health profile
       const registerResult = await registerUser({
         user_id:                 userId,
@@ -101,14 +137,10 @@ export default function Registration() {
       }
 
       // 2 — save financials if entered
-      if (form.monthly_income) {
+      if (financialPayload) {
         await saveFinancials({
-          user_id:          savedUserId,
-          employment_type:  form.employment_type || 'salaried',
-          monthly_income:   Number(form.monthly_income),
-          existing_emi:     Number(form.existing_emi) || 0,
-          cibil_score:      Number(form.cibil_score) || 700,
-          employment_years: Number(form.employment_years) || 1,
+          ...financialPayload,
+          user_id: savedUserId,
         })
       }
 

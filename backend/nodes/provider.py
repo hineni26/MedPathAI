@@ -43,14 +43,13 @@ def run_provider_node(state: dict) -> dict:
     if is_emergency and not procedure:
         procedure = "angioplasty"
 
-    # If still no procedure
+    fallback_note = None
+
+    # If still no procedure, use a broad diagnostic fallback so the user still
+    # gets hospitals to contact instead of a dead end.
     if not procedure:
-        return {
-            **state,
-            "hospitals":      [],
-            "provider_error": "Could not determine procedure.",
-            "nodes_visited":  nodes_visited,
-        }
+        procedure = "ct_scan"
+        fallback_note = "Used general diagnostic fallback because no exact supported procedure matched."
 
     # Search hospitals
     hospitals = search_hospitals(
@@ -63,6 +62,12 @@ def run_provider_node(state: dict) -> dict:
         user_lon      = user_lon,
         limit         = 3,
     )
+
+    provider_error = None
+    if not hospitals:
+        provider_error = (
+            f"No hospitals found in the current database for {procedure} in {city}."
+        )
 
     # Format for frontend
     formatted = []
@@ -107,6 +112,7 @@ def run_provider_node(state: dict) -> dict:
         "hospitals":      formatted,
         "city_info":      city_info,
         "procedure":      procedure,
+        "provider_note":  fallback_note,
         "nodes_visited":  nodes_visited,
-        "provider_error": None,
+        "provider_error": provider_error,
     }

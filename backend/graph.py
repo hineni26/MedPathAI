@@ -66,7 +66,7 @@ def route_after_intent(state: MedState) -> str:
     """
     After intent_node:
     - If emergency           → skip clarification, go straight to provider
-    - If ambiguity > 0.6     → ask clarifying question (max 2 attempts)
+    - If ambiguity is high    → ask up to two focused clarifying questions
     - If procedure known     → go to provider
     """
     is_emergency     = state.get("is_emergency", False)
@@ -78,7 +78,7 @@ def route_after_intent(state: MedState) -> str:
     if is_emergency and emergency_conf >= 0.85:
         return "provider"
 
-    if (not ready or ambiguity_score > 0.6) and clarify_attempts < 3:
+    if (not ready or ambiguity_score > 0.7) and clarify_attempts < 2:
         return "clarify"
 
     return "provider"
@@ -98,6 +98,7 @@ def clarify_node(state: MedState) -> MedState:
             "question": state.get("clarifying_question",
                         "Could you tell me more about what you're experiencing?"),
             "possible_causes": state.get("possible_causes", []),
+            "clinical_signals": state.get("possible_causes", []),
         },
         "nodes_visited": state.get("nodes_visited", []) + ["clarify"],
     }
@@ -159,6 +160,17 @@ async def run_graph(
     Main entry point called by FastAPI.
     Returns final_response dict.
     """
+    previous_clarifications = 0
+    for turn in conversation_history or []:
+        assistant_text = (turn.get("assistant") or "").lower()
+        if (
+            turn.get("type") == "clarification"
+            or "could you tell me more" in assistant_text
+            or "describe the pain" in assistant_text
+            or "describe your pain" in assistant_text
+        ):
+            previous_clarifications += 1
+
     initial_state: MedState = {
         "user_input":           user_input,
         "session_id":           session_id or "default",
@@ -167,7 +179,7 @@ async def run_graph(
         "conversation_history": conversation_history or [],
         "selected_hospital":    selected_hospital,
         "nodes_visited":        [],
-        "clarify_attempts":     0,
+        "clarify_attempts":     previous_clarifications,
         "is_emergency":         False,
         "recommendation_ready": False,
         "emergency_confidence": 0.0,

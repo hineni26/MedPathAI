@@ -3,7 +3,7 @@ import uuid
 import json
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -65,10 +65,10 @@ class RegisterRequest(BaseModel):
 class FinancialsRequest(BaseModel):
     user_id:          str
     employment_type:  str
-    monthly_income:   int
-    existing_emi:     int   = 0
-    cibil_score:      int
-    employment_years: float
+    monthly_income:   int   = Field(gt=0)
+    existing_emi:     int   = Field(default=0, ge=0)
+    cibil_score:      int   = Field(ge=300, le=900)
+    employment_years: float = Field(ge=0)
 
 class LoanApplyRequest(BaseModel):
     user_id:       str
@@ -353,6 +353,7 @@ async def chat(req: ChatRequest):
     history.append({
         "user":      req.message,
         "assistant": result.get("explanation") or result.get("question", ""),
+        "type":      result.get("type", "recommendation"),
     })
 
     # Save session — pass user_id so FK is satisfied
