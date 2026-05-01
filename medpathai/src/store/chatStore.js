@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const useChatStore = create((set, get) => ({
+export const useChatStore = create((set) => ({
   sessionId: null,
   messages: [],          // { id, role: 'user'|'ai', content, data?, timestamp }
   selectedHospital: null,

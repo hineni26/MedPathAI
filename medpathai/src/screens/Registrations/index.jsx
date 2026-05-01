@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import StepIndicator from '../../components/StepIndicator'
 import StepHealthProfile from './StepHealthProfile'
 import StepComorbidities from './StepComorbidities'
@@ -66,7 +66,7 @@ export default function Registration() {
         })
         .catch(() => {})
     }
-  }, [])
+  }, [setFinancials, setProfile, userId])
 
   function update(fields) {
     setForm((f) => ({ ...f, ...fields }))

@@ -35,7 +35,7 @@ const FIELD_CONFIGS = {
 }
 
 function formatValue(value, format) {
-  if (value === null || value === undefined || value === '') return '—'
+  if (value === null || value === undefined || value === '') return '-'
   switch (format) {
     case 'currency': return formatINR(Number(value))
     case 'score':

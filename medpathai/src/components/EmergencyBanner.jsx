@@ -76,7 +76,7 @@ export default function EmergencyBanner({ hospitals = [] }) {
               padding: '9px 18px',
               background: '#fff',
               color: 'var(--red-600)',
-              border: '1.5px solid var(--red-200)',
+              border: '1.5px solid var(--red-100)',
               borderRadius: 'var(--radius-lg)',
               fontWeight: 'var(--weight-medium)',
               fontSize: 'var(--text-sm)',
@@ -99,7 +99,7 @@ export default function EmergencyBanner({ hospitals = [] }) {
             gap: 10,
             padding: '12px 14px',
             background: '#fff',
-            border: '1px solid var(--red-200)',
+            border: '1px solid var(--red-100)',
             borderRadius: 'var(--radius-lg)',
           }}>
             <MapPin size={15} color="var(--red-500)" style={{ marginTop: 1, flexShrink: 0 }} />
@@ -119,7 +119,7 @@ export default function EmergencyBanner({ hospitals = [] }) {
                 {[
                   topHospital.emergency_24x7 && '24/7 Emergency',
                   topHospital.icu_beds && `${topHospital.icu_beds} ICU beds`,
-                  topHospital.ambulance_available && 'Ambulance available',
+                  (topHospital.ambulance_available || topHospital.ambulance) && 'Ambulance available',
                 ].filter(Boolean).join(' · ')}
               </div>
             </div>

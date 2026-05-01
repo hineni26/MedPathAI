@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router'
 import Sidebar from './Sidebar'
-import TopBar from './TopBar'
+import TopBar from './Topbar'
 import { ToastContainer } from './ui'
 
 export default function AppShell() {

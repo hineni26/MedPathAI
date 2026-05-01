@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const useUIStore = create((set, get) => ({
+export const useUIStore = create((set) => ({
   providerMode: false,
   toasts: [],
   modal: null,   // { type, props }

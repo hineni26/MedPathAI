@@ -4,8 +4,10 @@ import ExtractionPreview from './ExtractionPreview'
 
 function statusMeta(status) {
   switch (status) {
+    case 'done':
     case 'extracted':
       return { icon: CheckCircle, color: 'var(--green-500)', label: 'Extracted', bg: 'var(--green-50)', border: 'var(--green-100)' }
+    case 'pending':
     case 'processing':
       return { icon: Clock, color: 'var(--amber-500)', label: 'Processing…', bg: 'var(--amber-50)', border: 'var(--amber-100)' }
     case 'failed':
@@ -89,7 +91,7 @@ export default function DocumentCard({ doc, docType }) {
             color: 'var(--color-text-muted)',
             marginTop: 1,
           }}>
-            {doc.filename}
+            {doc.filename || doc.file_name}
           </div>
         </div>
         <div style={{
@@ -108,7 +110,7 @@ export default function DocumentCard({ doc, docType }) {
       </div>
 
       {/* Extracted fields preview */}
-      {doc.extraction_status === 'extracted' && doc.extracted_data && (
+      {['done', 'extracted'].includes(doc.extraction_status) && doc.extracted_data && (
         <ExtractionPreview data={doc.extracted_data} docType={doc.doc_type} />
       )}
 

@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, Info } from 'lucide-react'
-import { EMPLOYMENT_TYPES, INCOME_BANDS } from '../../utils/staticData'
+import { EMPLOYMENT_TYPES } from '../../utils/staticData'
 
 export default function StepFinancials({ form, update, onBack, onNext }) {
   return (

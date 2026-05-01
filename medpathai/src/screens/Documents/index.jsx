@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Shield, Info } from 'lucide-react'
 import { useUserStore } from '../../store/userStore'
-import { useUIStore } from '../../store/uiStore'
-import { getDocuments } from '../../api/documents'
 import UploadDropzone from './UploadDropzone'
 import DocumentCard from './DocumentCard'
 import { Spinner } from '../../components/ui'
+import useDocuments from '../../hooks/useDocuments'
 
 const DOC_SECTIONS = {
   financial: {
@@ -26,18 +24,8 @@ const DOC_SECTIONS = {
 }
 
 export default function Documents() {
-  const userId       = useUserStore((s) => s.userId)
   const documents    = useUserStore((s) => s.documents)
-  const setDocuments = useUserStore((s) => s.setDocuments)
-  const toast        = useUIStore((s) => s.toast)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    getDocuments(userId)
-      .then((data) => setDocuments(data.documents || []))
-      .catch(() => toast('Could not load documents', 'error'))
-      .finally(() => setLoading(false))
-  }, [userId])
+  const { loading } = useDocuments()
 
   const docsByType = {}
   documents.forEach((d) => {

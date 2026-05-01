@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Spinner } from '../../components/ui'
 import { BLOOD_GROUPS } from '../../utils/staticData'
-import { getProfile } from '../../api/registration'
-import { getUserId } from '../../api/auth'
+
+const FALLBACK_CITIES = [
+  'Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Chennai',
+  'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow',
+  'Nagpur', 'Indore', 'Coimbatore', 'Surat', 'Bhopal',
+]
 
 export default function StepHealthProfile({ form, update, onNext }) {
   const [cities, setCities]   = useState([])
@@ -14,15 +18,16 @@ export default function StepHealthProfile({ form, update, onNext }) {
   useEffect(() => {
     const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
     fetch(`${BASE}/api/meta/cities`)
-      .then((r) => r.json())
-      .then((data) => setCities(data.cities || []))
+      .then((r) => {
+        if (!r.ok) throw new Error('Cities endpoint unavailable')
+        return r.json()
+      })
+      .then((data) => {
+        const cityList = Array.isArray(data.cities) ? data.cities : []
+        setCities(cityList.length ? cityList : FALLBACK_CITIES)
+      })
       .catch(() => {
-        // Fallback to known list if endpoint not yet available
-        setCities([
-          'Mumbai','Delhi','Bengaluru','Hyderabad','Chennai',
-          'Kolkata','Pune','Ahmedabad','Jaipur','Lucknow',
-          'Nagpur','Indore','Coimbatore','Surat','Bhopal',
-        ])
+        setCities(FALLBACK_CITIES)
       })
       .finally(() => setLoadingCities(false))
   }, [])

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router'
 import { UserCircle, FileText, MessageCircle, Activity, LogOut } from 'lucide-react'
 import { useUserStore } from '../store/userStore'
 import { clearUserId, clearRegistration } from '../api/auth'

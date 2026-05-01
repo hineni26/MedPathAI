@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { Building2 } from 'lucide-react'
 import { useUIStore } from '../store/uiStore'
 

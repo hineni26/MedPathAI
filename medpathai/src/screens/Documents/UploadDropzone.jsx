@@ -1,14 +1,14 @@
 import { useState, useRef } from 'react'
 import { Upload, File, X } from 'lucide-react'
 import { DOC_TYPES } from '../../utils/staticData'
-import { uploadDocument } from '../../api/documents'
+import { getDocuments, uploadDocument } from '../../api/documents'
 import { useUserStore } from '../../store/userStore'
 import { useUIStore } from '../../store/uiStore'
 import { Spinner } from '../../components/ui'
 
 export default function UploadDropzone() {
   const userId     = useUserStore((s) => s.userId)
-  const addDocument = useUserStore((s) => s.addDocument)
+  const setDocuments = useUserStore((s) => s.setDocuments)
   const toast      = useUIStore((s) => s.toast)
 
   const [dragging, setDragging] = useState(false)
@@ -36,8 +36,9 @@ export default function UploadDropzone() {
     setProgress(0)
     try {
       const result = await uploadDocument(userId, docType, file, setProgress)
-      addDocument(result.document)
-      toast(`${file.name} uploaded successfully`, 'success')
+      const docs = await getDocuments(userId)
+      setDocuments(docs.documents || [])
+      toast(result.message || `${file.name} uploaded successfully`, 'success')
       setFile(null)
       setDocType('')
       setProgress(0)
