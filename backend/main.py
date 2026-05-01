@@ -92,7 +92,7 @@ def health():
 @app.post("/api/register")
 async def register(req: RegisterRequest):
     """Save user health profile."""
-    profile = req.dict()
+    profile = req.model_dump()
     success = save_user_profile(req.user_id, profile)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save profile")
@@ -122,9 +122,8 @@ async def get_profile(user_id: str):
 @app.post("/api/financials")
 async def save_financials(req: FinancialsRequest):
     """Save user financial details manually entered."""
-    from data_loader import check_loan_eligibility, calculate_pfl_options
 
-    financials = req.dict()
+    financials = req.model_dump()
 
     # Pre-calculate derived fields
     max_loan      = req.monthly_income * 10
