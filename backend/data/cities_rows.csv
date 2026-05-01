@@ -1,0 +1,16 @@
+city_id,city,state,tier,latitude,longitude
+city_001,Mumbai,Maharashtra,metro,19.076,72.8777
+city_002,Delhi,Delhi,metro,28.6139,77.209
+city_003,Bengaluru,Karnataka,metro,12.9716,77.5946
+city_004,Hyderabad,Telangana,metro,17.385,78.4867
+city_005,Chennai,Tamil Nadu,metro,13.0827,80.2707
+city_006,Kolkata,West Bengal,metro,22.5726,88.3639
+city_007,Pune,Maharashtra,tier2,18.5204,73.8567
+city_008,Ahmedabad,Gujarat,tier2,23.0225,72.5714
+city_009,Jaipur,Rajasthan,tier2,26.9124,75.7873
+city_010,Lucknow,Uttar Pradesh,tier2,26.8467,80.9462
+city_011,Nagpur,Maharashtra,tier2,21.1458,79.0882
+city_012,Indore,Madhya Pradesh,tier2,22.7196,75.8577
+city_013,Coimbatore,Tamil Nadu,tier2,11.0168,76.9558
+city_014,Surat,Gujarat,tier2,21.1702,72.8311
+city_015,Bhopal,Madhya Pradesh,tier3,23.2599,77.4126
