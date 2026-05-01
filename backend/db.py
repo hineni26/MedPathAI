@@ -96,7 +96,7 @@ def save_user_financials(user_id: str, financials: dict) -> bool:
             "max_loan_eligible_inr": financials.get("max_loan_eligible"),
             # employment_years has no dedicated Supabase column.
             # We store it in risk_band as a string so it survives DB round-trips.
-            "risk_band":             str(financials.get("employment_years", "")) or None,
+            "employment_years":      financials.get("employment_years"),
             "updated_at":            datetime.utcnow().isoformat(),
         }
         supabase.table("user_financials").upsert(data, on_conflict="user_id").execute()
@@ -125,11 +125,7 @@ def get_user_financials(user_id: str) -> dict | None:
             data["foir_headroom"]     = data.pop("foir", None)
             data["max_loan_eligible"] = data.pop("max_loan_eligible_inr", None)
             # Recover employment_years from risk_band (where we stored it)
-            raw_years = data.pop("risk_band", None)
-            try:
-                data["employment_years"] = float(raw_years) if raw_years else 2.0
-            except (ValueError, TypeError):
-                data["employment_years"] = 2.0
+            data["employment_years"] = float(data.pop("employment_years", None) or 2.0)
             return data
         return None
     except Exception as e:
