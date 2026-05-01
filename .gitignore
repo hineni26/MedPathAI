@@ -3,3 +3,4 @@ myVenv
 medpathai/node_modules
 .backend/__pycache__
 *.pyc
+MedPathAi_env/
