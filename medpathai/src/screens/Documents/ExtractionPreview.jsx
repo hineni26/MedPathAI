@@ -17,12 +17,12 @@ const FIELD_CONFIGS = {
     { key: 'total_assets',      label: 'Total Assets',      format: 'currency' },
     { key: 'total_liabilities', label: 'Total Liabilities', format: 'currency' },
   ],
-  cibil: [
+  cibil_report: [
     { key: 'cibil_score',       label: 'CIBIL Score',       format: 'score' },
     { key: 'active_loans',      label: 'Active Loans',      format: 'text' },
     { key: 'overdue_accounts',  label: 'Overdue Accounts',  format: 'text' },
   ],
-  insurance: [
+  insurance_policy: [
     { key: 'sum_insured',       label: 'Sum Insured',       format: 'currency' },
     { key: 'provider',          label: 'Provider',          format: 'text' },
     { key: 'expiry_date',       label: 'Valid Until',       format: 'text' },

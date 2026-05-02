@@ -14,12 +14,12 @@ const DOC_SECTIONS = {
   credit: {
     label: 'Credit & Liabilities',
     hint: 'Used to compute FOIR and max loan amount',
-    types: ['cibil'],
+    types: ['cibil_report'],
   },
   medical: {
     label: 'Medical Records',
     hint: 'Helps AI pre-understand your condition',
-    types: ['medical_records', 'insurance'],
+    types: ['medical_records', 'insurance_policy'],
   },
 }
 

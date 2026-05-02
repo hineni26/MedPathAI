@@ -24,3 +24,22 @@ export async function uploadDocument(userId, docType, file, onProgress) {
 
 export const getDocuments = (userId) =>
   client.get(`/api/documents/${userId}`)
+
+export async function replaceDocument(userId, documentId, file, onProgress) {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const response = await axios.put(`${BASE_URL}/api/documents/${userId}/${documentId}/file`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+    onUploadProgress: (e) => {
+      if (onProgress && e.total) {
+        onProgress(Math.round((e.loaded / e.total) * 100))
+      }
+    },
+  })
+  return response.data
+}
+
+export const deleteDocument = (userId, documentId) =>
+  client.delete(`/api/documents/${userId}/${documentId}`)

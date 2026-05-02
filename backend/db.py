@@ -22,6 +22,18 @@ print("✅ Supabase connected")
 
 # ── UUID helper ───────────────────────────────────────────────────────────────
 
+DOC_TYPE_ALIASES = {
+    "cibil": "cibil_report",
+    "insurance": "insurance_policy",
+}
+
+
+def normalize_doc_type(doc_type: str) -> str:
+    """Map old UI aliases to the doc_type values allowed by Supabase."""
+    normalized = (doc_type or "").strip().lower()
+    return DOC_TYPE_ALIASES.get(normalized, normalized)
+
+
 def to_uuid(user_id: str) -> str:
     """
     Convert any plain string user ID (e.g. "test_user_1") to a deterministic
@@ -233,6 +245,7 @@ def save_document_metadata(user_id: str, doc_type: str,
                             extraction_status: str | None = None) -> bool:
     """Track uploaded document metadata."""
     try:
+        doc_type = normalize_doc_type(doc_type)
         data = {
             "user_id":           to_uuid(user_id),
             "doc_type":          doc_type,
@@ -268,6 +281,7 @@ def get_user_documents(user_id: str) -> list[dict]:
 def mark_document_extracted(user_id: str, doc_type: str) -> bool:
     """Mark a document as extracted by Gemini."""
     try:
+        doc_type = normalize_doc_type(doc_type)
         (
             supabase.table("user_documents")
             .update({"extraction_status": "done"})
@@ -292,6 +306,7 @@ def update_document_extraction(
 ) -> bool:
     """Save extracted fields back onto the uploaded document row."""
     try:
+        doc_type = normalize_doc_type(doc_type)
         (
             supabase.table("user_documents")
             .update({
@@ -348,6 +363,60 @@ def delete_user_document(user_id: str, document_id: str) -> bool:
 # ══════════════════════════════════════════════════════════════════════════════
 # SESSIONS (conversation state)
 # ══════════════════════════════════════════════════════════════════════════════
+
+def get_user_document(user_id: str, document_id: str) -> dict | None:
+    """Get one document belonging to a user."""
+    try:
+        res = (
+            supabase.table("user_documents")
+            .select("*")
+            .eq("id", document_id)
+            .eq("user_id", to_uuid(user_id))
+            .single()
+            .execute()
+        )
+        return res.data or None
+    except Exception as e:
+        print(f"get_user_document error: {e}")
+        return None
+
+
+def update_user_document_file(
+    user_id: str,
+    document_id: str,
+    file_name: str,
+    storage_path: str,
+    file_url: str | None,
+    file_size_bytes: int,
+    mime_type: str | None,
+    extraction_status: str,
+) -> bool:
+    """Replace the stored file attached to an existing document row."""
+    try:
+        data = {
+            "file_name": file_name,
+            "storage_path": storage_path,
+            "file_url": file_url,
+            "file_size_bytes": file_size_bytes,
+            "mime_type": mime_type,
+            "extraction_status": extraction_status,
+            "extracted_json": None,
+            "extraction_summary": None,
+            "gemini_confidence": None,
+            "uploaded_at": datetime.utcnow().isoformat(),
+        }
+        res = (
+            supabase.table("user_documents")
+            .update(data)
+            .eq("id", document_id)
+            .eq("user_id", to_uuid(user_id))
+            .execute()
+        )
+        return bool(res.data)
+    except Exception as e:
+        print(f"update_user_document_file error: {e}")
+        return False
+
 
 def save_session(session_id: str, state: dict, user_id: str = None) -> bool:
     """
@@ -571,6 +640,7 @@ def save_document_with_url(user_id: str, doc_type: str,
                             extraction_status: str | None = None) -> bool:
     """Save document metadata including the Supabase Storage URL."""
     try:
+        doc_type = normalize_doc_type(doc_type)
         data = {
             "user_id":           to_uuid(user_id),
             "doc_type":          doc_type,

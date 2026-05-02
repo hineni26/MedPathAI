@@ -32,7 +32,7 @@ export const DOC_TYPES = [
   { value: 'salary_slip',    label: 'Salary Slip',     hint: 'Last 3 months' },
   { value: 'itr',            label: 'ITR',             hint: 'Last 3 years' },
   { value: 'balance_sheet',  label: 'Balance Sheet',   hint: 'For self-employed' },
-  { value: 'insurance',      label: 'Insurance Policy',hint: 'Health / Mediclaim' },
-  { value: 'cibil',          label: 'CIBIL Report',    hint: 'Credit report' },
+  { value: 'insurance_policy', label: 'Insurance Policy', hint: 'Health / Mediclaim' },
+  { value: 'cibil_report',     label: 'CIBIL Report',     hint: 'Credit report' },
   { value: 'medical_records',label: 'Medical Records', hint: 'Previous reports' },
 ]

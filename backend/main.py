@@ -17,6 +17,7 @@ from db import (
     save_user_financials, get_user_financials,
     save_document_metadata, get_user_documents, save_document_with_url,
     update_document_extraction, delete_user_document,
+    get_user_document, update_user_document_file,
     save_session, get_session,
     log_query,
     save_loan_application, get_loan_application,
@@ -113,6 +114,19 @@ DOC_VALIDATION_RULES = {
         "label": "medical record",
     },
 }
+
+DOC_TYPE_ALIASES = {
+    "cibil": "cibil_report",
+    "insurance": "insurance_policy",
+}
+
+ALLOWED_DOC_TYPES = set(DOC_VALIDATION_RULES)
+
+
+def normalize_doc_type(doc_type: str) -> str:
+    """Map old UI aliases to the doc_type values allowed by Supabase."""
+    normalized = (doc_type or "").strip().lower()
+    return DOC_TYPE_ALIASES.get(normalized, normalized)
 
 
 def validate_document_extraction(doc_type: str, extracted: dict) -> tuple[bool, str]:
@@ -282,6 +296,13 @@ async def upload_document(
     """
     contents = await file.read()
     original_filename = file.filename or "document"
+    doc_type = normalize_doc_type(doc_type)
+
+    if doc_type not in ALLOWED_DOC_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported document type '{doc_type}'.",
+        )
 
     # ── Save file to Supabase Storage ─────────────────────────────────────────
     file_url = None
@@ -451,6 +472,70 @@ async def get_documents(user_id: str):
     """Get all uploaded documents for a user."""
     docs = get_user_documents(user_id)
     return {"documents": docs}
+
+
+@app.put("/api/documents/{user_id}/{document_id}/file")
+async def replace_document_file(
+    user_id: str,
+    document_id: str,
+    file: UploadFile = File(...),
+):
+    """Replace the stored file for an uploaded document."""
+    existing = get_user_document(user_id, document_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    contents = await file.read()
+    original_filename = file.filename or "document"
+    doc_type = normalize_doc_type(existing.get("doc_type"))
+    storage_path = f"{to_uuid(user_id)}/{doc_type}/{uuid.uuid4()}-{original_filename}"
+
+    try:
+        from db import supabase
+        supabase.storage.from_(DOCUMENT_BUCKET).upload(
+            path=storage_path,
+            file=contents,
+            file_options={"content-type": file.content_type or "application/octet-stream"},
+        )
+        file_url = supabase.storage.from_(DOCUMENT_BUCKET).get_public_url(storage_path)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not upload replacement document to Supabase Storage bucket '{DOCUMENT_BUCKET}'.",
+        ) from e
+
+    status = "pending"
+    success = update_user_document_file(
+        user_id=user_id,
+        document_id=document_id,
+        file_name=original_filename,
+        storage_path=storage_path,
+        file_url=file_url,
+        file_size_bytes=len(contents),
+        mime_type=file.content_type,
+        extraction_status=status,
+    )
+    if not success:
+        try:
+            from db import supabase
+            supabase.storage.from_(DOCUMENT_BUCKET).remove([storage_path])
+        except Exception as e:
+            print(f"Replacement cleanup failed: {e}")
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    old_storage_path = existing.get("storage_path")
+    if old_storage_path:
+        try:
+            from db import supabase
+            supabase.storage.from_(DOCUMENT_BUCKET).remove([old_storage_path])
+        except Exception as e:
+            print(f"Old document cleanup failed: {e}")
+
+    return {
+        "success": True,
+        "file_url": file_url,
+        "message": f"{doc_type} replaced successfully.",
+    }
 
 
 @app.delete("/api/documents/{user_id}/{document_id}")
