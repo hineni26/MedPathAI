@@ -160,6 +160,14 @@ async def run_graph(
     Main entry point called by FastAPI.
     Returns final_response dict.
     """
+    # Compatibility for older LangGraph with newer LangChain packages.
+    try:
+        import langchain
+        if not hasattr(langchain, "debug"):
+            langchain.debug = False
+    except Exception:
+        pass
+
     previous_clarifications = 0
     for turn in conversation_history or []:
         assistant_text = (turn.get("assistant") or "").lower()

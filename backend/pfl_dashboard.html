@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poonawalla Fincorp — Loan Officer Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #1e3a5f;
+      color: white;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #f97316; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 16px; color: white;
+    }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .header p  { font-size: 12px; opacity: 0.7; margin-top: 1px; }
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.1); border-radius: 20px;
+      padding: 6px 14px; font-size: 13px;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4ade80; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 32px;
+      display: flex; gap: 32px;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 700; color: #1e3a5f; }
+    .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-num.green  { color: #16a34a; }
+    .stat-num.yellow { color: #d97706; }
+    .stat-num.red    { color: #dc2626; }
+
+    /* ── Main content ── */
+    .main { padding: 24px 32px; max-width: 1100px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 13px; font-weight: 600; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      background: white; border-radius: 12px;
+      padding: 60px; text-align: center;
+      border: 2px dashed #cbd5e1; color: #94a3b8;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty h3   { font-size: 16px; color: #475569; margin-bottom: 6px; }
+    .empty p    { font-size: 14px; }
+
+    /* ── Application card ── */
+    .card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      margin-bottom: 16px; overflow: hidden;
+      border-left: 5px solid #94a3b8;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .card.PENDING  { border-left-color: #f59e0b; }
+    .card.APPROVED { border-left-color: #16a34a; }
+    .card.REJECTED { border-left-color: #dc2626; }
+
+    .card-header {
+      padding: 16px 20px 12px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .ref-id   { font-size: 13px; font-weight: 700; color: #1e3a5f; font-family: monospace; }
+    .app-time { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+    .status-badge {
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+    }
+    .badge-PENDING  { background: #fef3c7; color: #92400e; }
+    .badge-APPROVED { background: #dcfce7; color: #14532d; }
+    .badge-REJECTED { background: #fee2e2; color: #7f1d1d; }
+
+    .card-body { padding: 0 20px 16px; }
+
+    .info-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 14px;
+    }
+    .info-item label {
+      font-size: 11px; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: 0.04em; display: block;
+      margin-bottom: 2px;
+    }
+    .info-item span { font-size: 14px; font-weight: 600; color: #1a202c; }
+
+    /* ── Credit checks ── */
+    .checks { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .check-pill {
+      font-size: 12px; padding: 4px 10px; border-radius: 6px;
+      font-weight: 500;
+    }
+    .check-PASS { background: #dcfce7; color: #15803d; }
+    .check-WARN { background: #fef9c3; color: #a16207; }
+    .check-FAIL { background: #fee2e2; color: #b91c1c; }
+
+    /* ── Documents ── */
+    .docs-section { margin-bottom: 14px; }
+    .docs-section label {
+      font-size: 11px; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.04em; display: block; margin-bottom: 6px;
+    }
+    .doc-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .doc-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 6px; padding: 5px 10px;
+      font-size: 12px; color: #1e3a5f; text-decoration: none;
+      font-weight: 500; transition: background 0.15s;
+    }
+    .doc-link:hover { background: #dbeafe; border-color: #93c5fd; }
+    .doc-icon { font-size: 14px; }
+    .no-docs { font-size: 12px; color: #94a3b8; font-style: italic; }
+
+    /* ── Medpath risk badge ── */
+    .risk-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .risk-label { font-size: 12px; color: #64748b; }
+    .risk-GREEN  { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .risk-YELLOW { background: #fef9c3; color: #a16207; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .risk-RED    { background: #fee2e2; color: #b91c1c; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+
+    /* ── Action buttons ── */
+    .actions { display: flex; gap: 10px; align-items: center; }
+    .btn-approve {
+      background: #16a34a; color: white; border: none;
+      padding: 10px 24px; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-approve:hover { background: #15803d; }
+    .btn-reject {
+      background: white; color: #dc2626;
+      border: 2px solid #dc2626; padding: 9px 24px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-reject:hover { background: #fee2e2; }
+    .note-input {
+      flex: 1; padding: 9px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 13px; color: #1a202c;
+      outline: none;
+    }
+    .note-input:focus { border-color: #93c5fd; }
+
+    .decided-info {
+      font-size: 13px; color: #64748b;
+      padding: 8px 14px; background: #f8fafc;
+      border-radius: 8px; border: 1px solid #e2e8f0;
+    }
+    .decided-info strong { color: #1a202c; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1e293b; color: white;
+      padding: 12px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+    .toast.success { border-left: 4px solid #4ade80; }
+    .toast.error   { border-left: 4px solid #f87171; }
+
+    /* ── Refresh indicator ── */
+    .refresh-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .refresh-text { font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">PF</div>
+    <div>
+      <h1>Poonawalla Fincorp</h1>
+      <p>Loan Officer Dashboard — MedPath Applications</p>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    Live — auto-refreshing
+  </div>
+</div>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" id="stat-total">—</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num yellow" id="stat-pending">—</div>
+    <div class="stat-label">Pending</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num green" id="stat-approved">—</div>
+    <div class="stat-label">Approved</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num red" id="stat-rejected">—</div>
+    <div class="stat-label">Rejected</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="refresh-row">
+    <div class="section-title">Loan Applications</div>
+    <div class="refresh-text" id="last-refresh">Connecting...</div>
+  </div>
+  <div id="app-list"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CONFIG — change this if your backend is not on localhost ──────────────
+  const API = "http://localhost:8000";
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  function fmt_inr(n) {
+    if (!n) return "—";
+    return "₹" + Number(n).toLocaleString("en-IN");
+  }
+
+  function fmt_date(iso) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleString("en-IN", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+  }
+
+  function doc_icon(doc_type) {
+    const icons = {
+      salary_slip:    "💰",
+      itr:            "📋",
+      bank_statement: "🏦",
+      insurance_policy: "🛡️",
+      cibil_report:  "📈",
+      balance_sheet:  "📊",
+      pan:            "🪪",
+    };
+    return icons[doc_type] || "📄";
+  }
+
+  function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className   = `toast show ${type}`;
+    setTimeout(() => t.className = "toast", 2800);
+  }
+
+  // ── Decide (approve / reject) ─────────────────────────────────────────────
+
+  async function decide(refId, decision) {
+    const noteEl = document.getElementById(`note-${refId}`);
+    const note   = noteEl ? noteEl.value.trim() : "";
+
+    try {
+      const res = await fetch(
+        `${API}/api/pfl/decide?reference_id=${refId}&decision=${decision}&officer_note=${encodeURIComponent(note)}`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          decision === "APPROVED"
+            ? `✅ ${refId} approved`
+            : `❌ ${refId} rejected`,
+          decision === "APPROVED" ? "success" : "error"
+        );
+        loadApplications();
+      } else {
+        showToast("Something went wrong — try again", "error");
+      }
+    } catch (e) {
+      showToast("Cannot reach backend — is it running?", "error");
+    }
+  }
+
+  // ── Render cards ──────────────────────────────────────────────────────────
+
+  function renderCard(app) {
+    const isPending = app.status === "PENDING";
+
+    // Parse documents list
+    let docs = [];
+    try { docs = JSON.parse(app.documents_json || "[]"); } catch {}
+
+    // Parse checks from application_json
+    let checks = {};
+    try {
+      const full = JSON.parse(app.application_json || "{}");
+      // checks live inside eligibility result — we stored medpath_decision + flags
+    } catch {}
+
+    const docsHtml = docs.length
+      ? docs.map(d => {
+          if (!d.url) return `<span class="no-docs">${doc_icon(d.doc_type)} ${d.doc_type} (no URL)</span>`;
+          return `<a class="doc-link" href="${d.url}" target="_blank">
+            <span class="doc-icon">${doc_icon(d.doc_type)}</span>
+            ${d.doc_type.replace(/_/g, " ")}
+          </a>`;
+        }).join("")
+      : `<span class="no-docs">No documents attached</span>`;
+
+    const riskClass = app.medpath_decision || "YELLOW";
+    const foir_pct  = app.foir ? Math.round(app.foir * 100) + "%" : "—";
+
+    const actionsHtml = isPending ? `
+      <div class="actions">
+        <input
+          class="note-input"
+          id="note-${app.reference_id}"
+          placeholder="Optional officer note..."
+        />
+        <button class="btn-approve" onclick="decide('${app.reference_id}', 'APPROVED')">
+          ✅ Approve
+        </button>
+        <button class="btn-reject" onclick="decide('${app.reference_id}', 'REJECTED')">
+          ❌ Reject
+        </button>
+      </div>
+    ` : `
+      <div class="decided-info">
+        <strong>${app.status}</strong> on ${fmt_date(app.decided_at)}
+        ${app.officer_note ? ` — "${app.officer_note}"` : ""}
+      </div>
+    `;
+
+    return `
+      <div class="card ${app.status}">
+        <div class="card-header">
+          <div>
+            <div class="ref-id">${app.reference_id}</div>
+            <div class="app-time">Applied ${fmt_date(app.applied_at)}</div>
+          </div>
+          <span class="status-badge badge-${app.status}">${app.status}</span>
+        </div>
+        <div class="card-body">
+
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Applicant</label>
+              <span>${app.applicant_name || "—"}, ${app.age || "—"} yrs</span>
+            </div>
+            <div class="info-item">
+              <label>City</label>
+              <span>${app.city || "—"}</span>
+            </div>
+            <div class="info-item">
+              <label>Hospital</label>
+              <span>${app.hospital_name || "—"}</span>
+            </div>
+            <div class="info-item">
+              <label>Procedure</label>
+              <span>${app.procedure || "—"}</span>
+            </div>
+            <div class="info-item">
+              <label>Loan Amount</label>
+              <span>${fmt_inr(app.loan_amount)}</span>
+            </div>
+            <div class="info-item">
+              <label>EMI / Tenure</label>
+              <span>${fmt_inr(app.emi)} × ${app.tenure_months || "—"} mo</span>
+            </div>
+            <div class="info-item">
+              <label>Monthly Income</label>
+              <span>${fmt_inr(app.monthly_income)}</span>
+            </div>
+            <div class="info-item">
+              <label>Existing EMI</label>
+              <span>${fmt_inr(app.existing_emi)}</span>
+            </div>
+            <div class="info-item">
+              <label>CIBIL Score</label>
+              <span>${app.cibil_score || "—"}</span>
+            </div>
+          </div>
+
+          <div class="risk-row">
+            <span class="risk-label">MedPath pre-check:</span>
+            <span class="risk-${riskClass}">${riskClass}</span>
+            <span class="risk-label" style="margin-left:12px">FOIR: ${foir_pct}</span>
+            <span class="risk-label" style="margin-left:12px">Risk band: ${app.risk_band || "—"}</span>
+          </div>
+
+          <div class="docs-section">
+            <label>Documents</label>
+            <div class="doc-list">${docsHtml}</div>
+          </div>
+
+          ${actionsHtml}
+
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Load and render all applications ─────────────────────────────────────
+
+  async function loadApplications() {
+    try {
+      const res  = await fetch(`${API}/api/pfl/applications`);
+      const data = await res.json();
+      const apps = data.applications || [];
+
+      // Update stats
+      document.getElementById("stat-total").textContent    = apps.length;
+      document.getElementById("stat-pending").textContent  = apps.filter(a => a.status === "PENDING").length;
+      document.getElementById("stat-approved").textContent = apps.filter(a => a.status === "APPROVED").length;
+      document.getElementById("stat-rejected").textContent = apps.filter(a => a.status === "REJECTED").length;
+
+      // Render cards
+      const list = document.getElementById("app-list");
+      if (apps.length === 0) {
+        list.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            <h3>No applications yet</h3>
+            <p>When a patient applies for a PFL loan on MedPath, it will appear here.</p>
+          </div>
+        `;
+      } else {
+        list.innerHTML = apps.map(renderCard).join("");
+      }
+
+      document.getElementById("last-refresh").textContent =
+        "Last updated: " + new Date().toLocaleTimeString("en-IN");
+
+    } catch (e) {
+      document.getElementById("last-refresh").textContent = "⚠️ Cannot reach backend";
+      document.getElementById("app-list").innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">⚠️</div>
+          <h3>Cannot connect to MedPath backend</h3>
+          <p>Make sure the server is running at <strong>${API}</strong></p>
+        </div>
+      `;
+    }
+  }
+
+  // ── Start ─────────────────────────────────────────────────────────────────
+  loadApplications();
+  setInterval(loadApplications, 3000);   // auto-refresh every 3 seconds
+</script>
+</body>
+</html>

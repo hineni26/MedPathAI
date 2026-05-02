@@ -1,0 +1,356 @@
+⏳ Loading data from Supabase...
+✅ Loaded 60 hospitals, 731 procedures, 15 cities from Supabase
+✅ LangGraph compiled successfully
+✅ Supabase connected
+INFO:     127.0.0.1:8273 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1907 - "POST /api/documents/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1912 - "POST /api/documents/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1913 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1913 - "DELETE /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41/4191f1b2-de39-444d-86dc-96f922cda19a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1913 - "DELETE /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41/69ee4336-a8e5-4134-8b06-d808871d8640 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14447 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14447 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5622 - "POST /api/documents/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5622 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7523 - "POST /api/documents/upload HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7523 - "POST /api/documents/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7523 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2897 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7406 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6148 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6148 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 21.529406909s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 21
+}
+]
+INFO:     127.0.0.1:6148 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:3957 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 10.801168324s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 10
+}
+]
+INFO:     127.0.0.1:11035 - "POST /api/chat HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 7.982892633s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 7
+}
+]
+INFO:     127.0.0.1:11035 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "OPTIONS /api/loan/apply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "POST /api/loan/apply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "POST /api/pfl/decide?reference_id=PFL-MED-2026-48655&decision=APPROVED&officer_note= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5672 - "GET /api/loan/status/PFL-MED-2026-48655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6357 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 41.177711486s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 41
+}
+]
+INFO:     127.0.0.1:6357 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 20.134884172s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 20
+}
+]
+INFO:     127.0.0.1:13349 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5826 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11086 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:9752 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:12162 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8934 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14720 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8934 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14720 - "GET /api/meta/cities HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8934 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1884 - "GET /api/meta/cities HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2238 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2238 - "GET /api/documents/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1902 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1902 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14632 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 5.130934145s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 5
+}
+]
+INFO:     127.0.0.1:14632 - "POST /api/chat HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 45.392788743s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 45
+}
+]
+INFO:     127.0.0.1:5853 - "POST /api/chat HTTP/1.1" 200 OK
+❌ intent_node Gemini error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash
+Please retry in 33.368903768s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.5-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 33
+}
+]
+INFO:     127.0.0.1:6680 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "OPTIONS /api/loan/apply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "POST /api/loan/apply HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "POST /api/pfl/decide?reference_id=PFL-MED-2026-17570&decision=APPROVED&officer_note= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:8663 - "GET /api/loan/status/PFL-MED-2026-17570 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:1043 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7666 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10032 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7673 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14872 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:4810 - "GET /api/profile/f318c34c-843d-517c-afe2-04ed5ff5fc41 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11205 - "GET /api/pfl/applications HTTP/1.1" 200 OK

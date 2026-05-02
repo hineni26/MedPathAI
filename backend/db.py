@@ -1,3 +1,4 @@
+#hi
 import os
 import uuid
 import base64
@@ -13,6 +14,7 @@ load_dotenv()
 # ── Supabase client ────────────────────────────────────────────────────────────
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+DOCUMENT_BUCKET = os.getenv("DOCUMENT_BUCKET", "medical-documents")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 print("✅ Supabase connected")
@@ -224,14 +226,21 @@ def get_user_financials(user_id: str) -> dict | None:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def save_document_metadata(user_id: str, doc_type: str,
-                            filename: str, extracted: bool = False) -> bool:
+                            filename: str, extracted: bool = False,
+                            storage_path: str | None = None,
+                            file_size_bytes: int | None = None,
+                            mime_type: str | None = None,
+                            extraction_status: str | None = None) -> bool:
     """Track uploaded document metadata."""
     try:
         data = {
             "user_id":           to_uuid(user_id),
             "doc_type":          doc_type,
             "file_name":         filename,
-            "extraction_status": "done" if extracted else "pending",
+            "file_size_bytes":   file_size_bytes,
+            "mime_type":         mime_type,
+            "storage_path":      storage_path or f"{to_uuid(user_id)}/{doc_type}/{filename}",
+            "extraction_status": extraction_status or ("done" if extracted else "pending"),
             "uploaded_at":       datetime.utcnow().isoformat(),
         }
         supabase.table("user_documents").insert(data).execute()
@@ -269,6 +278,70 @@ def mark_document_extracted(user_id: str, doc_type: str) -> bool:
         return True
     except Exception as e:
         print(f"❌ mark_document_extracted error: {e}")
+        return False
+
+
+def update_document_extraction(
+    user_id: str,
+    doc_type: str,
+    storage_path: str,
+    extracted_json: dict,
+    status: str = "done",
+    summary: str | None = None,
+    confidence: float | None = None,
+) -> bool:
+    """Save extracted fields back onto the uploaded document row."""
+    try:
+        (
+            supabase.table("user_documents")
+            .update({
+                "extraction_status": status,
+                "extracted_json": extracted_json,
+                "extraction_summary": summary,
+                "gemini_confidence": confidence,
+            })
+            .eq("user_id", to_uuid(user_id))
+            .eq("doc_type", doc_type)
+            .eq("storage_path", storage_path)
+            .execute()
+        )
+        return True
+    except Exception as e:
+        print(f"❌ update_document_extraction error: {e}")
+        return False
+
+
+def delete_user_document(user_id: str, document_id: str) -> bool:
+    """Delete a user's document metadata and best-effort remove the storage object."""
+    try:
+        res = (
+            supabase.table("user_documents")
+            .select("id, storage_path")
+            .eq("id", document_id)
+            .eq("user_id", to_uuid(user_id))
+            .single()
+            .execute()
+        )
+        if not res.data:
+            return False
+
+        storage_path = res.data.get("storage_path")
+        if storage_path:
+            try:
+                supabase.storage.from_(DOCUMENT_BUCKET).remove([storage_path])
+            except Exception as e:
+                print(f"⚠️  Storage delete failed (metadata will still be removed): {e}")
+
+        (
+            supabase.table("user_documents")
+            .delete()
+            .eq("id", document_id)
+            .eq("user_id", to_uuid(user_id))
+            .execute()
+        )
+        return True
+    except Exception as e:
+        print(f"❌ delete_user_document error: {e}")
         return False
 
 
@@ -368,3 +441,133 @@ def get_recent_queries(user_id: str, limit: int = 10) -> list[dict]:
     except Exception as e:
         print(f"❌ get_recent_queries error: {e}")
         return []
+
+# LOAN APPLICATIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _as_int(value, default: int | None = None) -> int | None:
+    if value in (None, ""):
+        return default
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def _as_float(value, default: float | None = None) -> float | None:
+    if value in (None, ""):
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+def save_loan_application(reference_id: str, user_id: str, application: dict) -> bool:
+    """Save full loan application package to Supabase."""
+    import json
+    try:
+        data = {
+            "reference_id":       reference_id,
+            "user_id":            to_uuid(user_id),
+            "applicant_name":     application.get("applicant_name"),
+            "age":                _as_int(application.get("age")),
+            "city":               application.get("city"),
+            "loan_amount":        _as_int(application.get("loan_amount")),
+            "tenure_months":      _as_int(application.get("tenure_months")),
+            "interest_rate":      _as_float(application.get("interest_rate", 9.99)),
+            "emi":                _as_int(application.get("emi")),
+            "processing_fee":     _as_int(application.get("processing_fee")),
+            "hospital_name":      application.get("hospital_name"),
+            "procedure":          application.get("procedure"),
+            "monthly_income":     _as_int(application.get("monthly_income")),
+            "existing_emi":       _as_int(application.get("existing_emi"), 0),
+            "cibil_score":        _as_int(application.get("cibil_score")),
+            "foir":               _as_float(application.get("foir")),
+            "employment_years":   _as_float(application.get("employment_years")),
+            "employment_type":    application.get("employment_type"),
+            "medpath_decision":   application.get("medpath_decision"),
+            "risk_band":          application.get("risk_band"),
+            "eligibility_flags":  json.dumps(application.get("eligibility_flags", [])),
+            "application_json":   json.dumps(application),
+            "documents_json":     json.dumps(application.get("documents", [])),
+            "status":             "PENDING",
+            "applied_at":         datetime.utcnow().isoformat(),
+        }
+        supabase.table("loan_applications").insert(data).execute()
+        return True
+    except Exception as e:
+        print(f"❌ save_loan_application error: {e}")
+        return False
+
+
+def get_loan_application(reference_id: str) -> dict | None:
+    """Fetch a single loan application by reference ID."""
+    try:
+        res = (
+            supabase.table("loan_applications")
+            .select("*")
+            .eq("reference_id", reference_id)
+            .single()
+            .execute()
+        )
+        return res.data or None
+    except Exception as e:
+        print(f"❌ get_loan_application error: {e}")
+        return None
+
+
+def update_loan_status(reference_id: str, status: str, officer_note: str = "") -> bool:
+    """PFL officer approves or rejects an application."""
+    try:
+        supabase.table("loan_applications").update({
+            "status":       status,
+            "officer_note": officer_note,
+            "decided_at":   datetime.utcnow().isoformat(),
+            "updated_at":   datetime.utcnow().isoformat(),
+        }).eq("reference_id", reference_id).execute()
+        return True
+    except Exception as e:
+        print(f"❌ update_loan_status error: {e}")
+        return False
+
+
+def get_all_loan_applications() -> list[dict]:
+    """PFL dashboard — get all applications, newest first."""
+    try:
+        res = (
+            supabase.table("loan_applications")
+            .select("*")
+            .order("applied_at", desc=True)
+            .execute()
+        )
+        return res.data or []
+    except Exception as e:
+        print(f"❌ get_all_loan_applications error: {e}")
+        return []
+
+
+def save_document_with_url(user_id: str, doc_type: str,
+                            filename: str, file_url: str,
+                            extracted: bool = False,
+                            storage_path: str | None = None,
+                            file_size_bytes: int | None = None,
+                            mime_type: str | None = None,
+                            extraction_status: str | None = None) -> bool:
+    """Save document metadata including the Supabase Storage URL."""
+    try:
+        data = {
+            "user_id":           to_uuid(user_id),
+            "doc_type":          doc_type,
+            "file_name":         filename,
+            "file_size_bytes":   file_size_bytes,
+            "mime_type":         mime_type,
+            "storage_path":      storage_path or f"{to_uuid(user_id)}/{doc_type}/{filename}",
+            "file_url":          file_url,
+            "extraction_status": extraction_status or ("done" if extracted else "pending"),
+            "uploaded_at":       datetime.utcnow().isoformat(),
+        }
+        supabase.table("user_documents").insert(data).execute()
+        return True
+    except Exception as e:
+        print(f"❌ save_document_with_url error: {e}")
+        return False
