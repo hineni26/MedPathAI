@@ -20,7 +20,7 @@ from db import (
     save_session, get_session,
     log_query,
     save_loan_application, get_loan_application,
-    update_loan_status, get_all_loan_applications,
+    update_loan_status, get_all_loan_applications, get_user_loan_applications,
 )
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -646,6 +646,13 @@ async def loan_status(reference_id: str):
         "tenure_months": application.get("tenure_months"),
         "hospital_name": application.get("hospital_name"),
     }
+
+
+@app.get("/api/loan/applications/{user_id}")
+async def user_loan_applications(user_id: str):
+    """Patient loan history - returns only applications owned by this user."""
+    applications = get_user_loan_applications(user_id)
+    return {"applications": applications}
 
 
 @app.post("/api/pfl/decide")

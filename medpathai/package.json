@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:pfl": "vite --config vite.pfl.config.js",
     "build": "vite build",
+    "build:pfl": "vite build --config vite.pfl.config.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:pfl": "vite preview --config vite.pfl.config.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",

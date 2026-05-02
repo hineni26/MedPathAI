@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router'
-import { UserCircle, FileText, MessageCircle, Activity, LogOut, LogIn, Moon, Sun, BriefcaseBusiness } from 'lucide-react'
+import { UserCircle, FileText, MessageCircle, Activity, LogOut, LogIn, Moon, Sun, ReceiptText } from 'lucide-react'
 import { useUserStore } from '../store/userStore'
 import { clearUserId, clearRegistration, isRegistered } from '../api/auth'
 import { useChatStore } from '../store/chatStore'
@@ -10,7 +10,7 @@ const NAV = [
   { to: '/register', icon: UserCircle,    label: 'Profile',   end: true  },
   { to: '/documents',icon: FileText,      label: 'Documents', end: false },
   { to: '/chat',     icon: MessageCircle, label: 'Chat',      end: false },
-  { to: '/pfl-dashboard', icon: BriefcaseBusiness, label: 'PFL Desk', end: false },
+  { to: '/loans',    icon: ReceiptText,   label: 'Loan History', end: false },
 ]
 
 export default function Sidebar() {

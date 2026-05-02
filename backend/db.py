@@ -546,6 +546,22 @@ def get_all_loan_applications() -> list[dict]:
         return []
 
 
+def get_user_loan_applications(user_id: str) -> list[dict]:
+    """Patient dashboard - get this user's loan applications, newest first."""
+    try:
+        res = (
+            supabase.table("loan_applications")
+            .select("*")
+            .eq("user_id", to_uuid(user_id))
+            .order("applied_at", desc=True)
+            .execute()
+        )
+        return res.data or []
+    except Exception as e:
+        print(f"get_user_loan_applications error: {e}")
+        return []
+
+
 def save_document_with_url(user_id: str, doc_type: str,
                             filename: str, file_url: str,
                             extracted: bool = False,
