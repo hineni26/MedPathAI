@@ -49,7 +49,7 @@ export default function StepComorbidities({ form, update, onBack, onNext }) {
                 padding: '12px 14px',
                 borderRadius: 'var(--radius-lg)',
                 border: `1.5px solid ${selected ? 'var(--teal-400)' : 'var(--color-border)'}`,
-                background: selected ? 'var(--teal-50)' : '#fff',
+                background: selected ? 'var(--teal-50)' : 'var(--color-bg-input)',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all var(--transition-fast)',

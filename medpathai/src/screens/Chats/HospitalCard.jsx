@@ -37,7 +37,7 @@ export default function HospitalCard({ hospital, selected, onSelect }) {
           width: 44,
           height: 44,
           borderRadius: 'var(--radius-lg)',
-          background: '#fff',
+          background: 'var(--color-bg-elevated)',
           border: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',

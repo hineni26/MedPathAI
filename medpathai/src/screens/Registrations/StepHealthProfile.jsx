@@ -186,7 +186,7 @@ export default function StepHealthProfile({ form, update, onNext }) {
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--weight-medium)',
                 border: `1.5px solid ${form.blood_group === bg ? 'var(--teal-500)' : 'var(--color-border)'}`,
-                background: form.blood_group === bg ? 'var(--teal-50)' : '#fff',
+                background: form.blood_group === bg ? 'var(--teal-50)' : 'var(--color-bg-input)',
                 color: form.blood_group === bg ? 'var(--teal-700)' : 'var(--color-text-secondary)',
                 transition: 'all var(--transition-fast)',
                 cursor: 'pointer',

@@ -65,7 +65,7 @@ export default function UploadDropzone() {
           padding: '28px 20px',
           textAlign: 'center',
           cursor: file ? 'default' : 'pointer',
-          background: dragging ? 'var(--teal-50)' : file ? 'var(--gray-50)' : '#fff',
+          background: dragging ? 'var(--teal-50)' : file ? 'var(--color-bg-muted)' : 'var(--color-bg-input)',
           transition: 'all var(--transition-base)',
           marginBottom: 'var(--space-4)',
         }}

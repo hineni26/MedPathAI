@@ -63,7 +63,7 @@ export default function ExtractionPreview({ data, docType }) {
 
   return (
     <div style={{
-      background: '#fff',
+      background: 'var(--color-bg-surface)',
       border: '1px solid var(--color-border)',
       borderRadius: 'var(--radius-lg)',
       overflow: 'hidden',
@@ -77,7 +77,7 @@ export default function ExtractionPreview({ data, docType }) {
             alignItems: 'center',
             padding: '7px 12px',
             borderBottom: i < visible.length - 1 ? '1px solid var(--color-border)' : 'none',
-            background: i % 2 === 0 ? '#fff' : 'var(--gray-50)',
+            background: i % 2 === 0 ? 'var(--color-bg-surface)' : 'var(--color-bg-muted)',
           }}
         >
           <span style={{

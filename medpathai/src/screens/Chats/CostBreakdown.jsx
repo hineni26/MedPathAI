@@ -62,7 +62,7 @@ export default function CostBreakdown({ cost }) {
                 justifyContent: 'space-between',
                 gap: 12,
                 padding: '9px 12px',
-                background: index % 2 ? 'var(--gray-50)' : '#fff',
+                background: index % 2 ? 'var(--color-bg-muted)' : 'var(--color-bg-surface)',
                 fontSize: 'var(--text-xs)',
               }}
             >

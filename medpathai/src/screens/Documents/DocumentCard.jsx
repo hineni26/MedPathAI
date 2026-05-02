@@ -71,7 +71,7 @@ export default function DocumentCard({ doc, docType }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
         <div style={{
           width: 36, height: 36, borderRadius: 'var(--radius-lg)',
-          background: '#fff',
+          background: 'var(--color-bg-surface)',
           border: '1px solid var(--color-border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
@@ -98,7 +98,7 @@ export default function DocumentCard({ doc, docType }) {
           display: 'flex', alignItems: 'center', gap: 4,
           padding: '3px 8px',
           borderRadius: 'var(--radius-full)',
-          background: '#fff',
+          background: 'var(--color-bg-surface)',
           border: `1px solid ${status.border}`,
           flexShrink: 0,
         }}>

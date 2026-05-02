@@ -36,7 +36,7 @@ export default function StepFinancials({ form, update, onBack, onNext }) {
                   padding: '8px 16px',
                   borderRadius: 'var(--radius-full)',
                   border: `1.5px solid ${sel ? 'var(--teal-400)' : 'var(--color-border)'}`,
-                  background: sel ? 'var(--teal-50)' : '#fff',
+                  background: sel ? 'var(--teal-50)' : 'var(--color-bg-input)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: sel ? 'var(--weight-medium)' : 'var(--weight-regular)',
                   color: sel ? 'var(--teal-800)' : 'var(--color-text-primary)',

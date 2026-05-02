@@ -47,7 +47,7 @@ export default function StepInsurance({ form, update, onBack, onNext }) {
                   padding: '9px 12px',
                   borderRadius: 'var(--radius-lg)',
                   border: `1.5px solid ${selected ? 'var(--teal-400)' : 'var(--color-border)'}`,
-                  background: selected ? 'var(--teal-50)' : '#fff',
+                  background: selected ? 'var(--teal-50)' : 'var(--color-bg-input)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: selected ? 'var(--weight-medium)' : 'var(--weight-regular)',
                   color: selected ? 'var(--teal-800)' : 'var(--color-text-primary)',
