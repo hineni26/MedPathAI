@@ -5,7 +5,7 @@ import PFLDashboard from '../src/screens/PFLDashboard'
 import { ToastContainer } from '../src/components/ui'
 import { useUIStore } from '../src/store/uiStore'
 
-function PFLOfficerApp() {
+export function PFLOfficerApp() {
   const theme = useUIStore((s) => s.theme)
 
   useEffect(() => {

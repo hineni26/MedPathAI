@@ -76,13 +76,9 @@ export default function MessageList({ messages, loading, providerMode, profile, 
 }
 
 function ResultCards({ data, providerMode, selectedHospital, onSelectHospital }) {
-  const [showFinancing, setShowFinancing] = useState(false)
+  const [financingHospitalId, setFinancingHospitalId] = useState(null)
   const selectedHospitalId = selectedHospital?.hospital_id
   const clinicalSignals = data.clinical_signals || data.possible_causes || []
-
-  useEffect(() => {
-    setShowFinancing(false)
-  }, [selectedHospitalId])
 
   if (data.type === 'clarification') {
     return (
@@ -106,6 +102,7 @@ function ResultCards({ data, providerMode, selectedHospital, onSelectHospital })
   const activeCost = data.cost_results_by_hospital?.[activeHospitalId] || activeHospital?.cost_result || data.cost_result
   const activePfl = data.pfl_options_by_hospital?.[activeHospitalId] || activeHospital?.pfl_options || data.pfl_options
   const activeEligibility = data.loan_eligibility_by_hospital?.[activeHospitalId] || activeHospital?.loan_eligibility || data.loan_eligibility
+  const showFinancing = Boolean(activeHospitalId && financingHospitalId === activeHospitalId)
 
   return (
     <div style={{
@@ -151,7 +148,7 @@ function ResultCards({ data, providerMode, selectedHospital, onSelectHospital })
                   </p>
                 </div>
               </div>
-              <button className="btn btn-primary btn-sm" onClick={() => setShowFinancing(true)}>
+              <button className="btn btn-primary btn-sm" onClick={() => setFinancingHospitalId(activeHospitalId)}>
                 Yes, check
               </button>
             </div>

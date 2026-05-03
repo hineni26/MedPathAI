@@ -168,7 +168,8 @@ export default function LoanHistory() {
   }, [userId])
 
   useEffect(() => {
-    loadApplications()
+    const timeoutId = window.setTimeout(loadApplications, 0)
+    return () => window.clearTimeout(timeoutId)
   }, [loadApplications])
 
   return (

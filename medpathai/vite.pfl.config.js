@@ -8,6 +8,7 @@ const officerRoot = fileURLToPath(new URL('./officer', import.meta.url))
 
 export default defineConfig({
   root: officerRoot,
+  envDir: projectRoot,
   plugins: [react(), tailwindcss()],
   server: {
     port: 5174,

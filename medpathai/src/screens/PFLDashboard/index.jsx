@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Clock, FileText, Landmark, Shield, TrendingUp, X } from 'lucide-react'
 import { decidePFLApplication, getPFLApplications } from '../../api/pfl'
 import { useUIStore } from '../../store/uiStore'
@@ -167,6 +167,7 @@ function ApplicationCard({ app, note, onNoteChange, onDecide }) {
 
 export default function PFLDashboard() {
   const toast = useUIStore((s) => s.toast)
+  const loadingRef = useRef(false)
   const [applications, setApplications] = useState([])
   const [notes, setNotes] = useState({})
   const [lastRefresh, setLastRefresh] = useState('Connecting...')
@@ -180,6 +181,8 @@ export default function PFLDashboard() {
   }), [applications])
 
   const loadApplications = useCallback(async () => {
+    if (loadingRef.current) return
+    loadingRef.current = true
     try {
       const data = await getPFLApplications()
       setApplications(data.applications || [])
@@ -188,13 +191,30 @@ export default function PFLDashboard() {
     } catch {
       setHasConnectionError(true)
       setLastRefresh('Cannot reach backend')
+    } finally {
+      loadingRef.current = false
     }
   }, [])
 
   useEffect(() => {
-    loadApplications()
-    const intervalId = window.setInterval(loadApplications, REFRESH_MS)
-    return () => window.clearInterval(intervalId)
+    const timeoutId = window.setTimeout(loadApplications, 0)
+    const intervalId = window.setInterval(() => {
+      if (!document.hidden) {
+        loadApplications()
+      }
+    }, REFRESH_MS)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadApplications()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      window.clearTimeout(timeoutId)
+      window.clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [loadApplications])
 
   function handleNoteChange(referenceId, note) {

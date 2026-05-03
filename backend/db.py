@@ -443,16 +443,17 @@ def save_session(session_id: str, state: dict, user_id: str = None) -> bool:
         return False
 
 
-def get_session(session_id: str) -> dict | None:
-    """Load session state."""
+def get_session(session_id: str, user_id: str | None = None) -> dict | None:
+    """Load session state, optionally scoped to the owning user."""
     try:
-        res = (
+        query = (
             supabase.table("sessions")
             .select("langgraph_state")
             .eq("id", session_id)
-            .limit(1)
-            .execute()
         )
+        if user_id:
+            query = query.eq("user_id", to_uuid(user_id))
+        res = query.limit(1).execute()
         if res.data:
             return res.data[0].get("langgraph_state")
         return None
@@ -600,13 +601,45 @@ def update_loan_status(reference_id: str, status: str, officer_note: str = "") -
         return False
 
 
+LOAN_APPLICATION_LIST_COLUMNS = ",".join([
+    "reference_id",
+    "user_id",
+    "applicant_name",
+    "age",
+    "city",
+    "loan_amount",
+    "tenure_months",
+    "interest_rate",
+    "emi",
+    "processing_fee",
+    "hospital_name",
+    "procedure",
+    "monthly_income",
+    "existing_emi",
+    "cibil_score",
+    "foir",
+    "employment_years",
+    "employment_type",
+    "medpath_decision",
+    "risk_band",
+    "eligibility_flags",
+    "documents_json",
+    "status",
+    "officer_note",
+    "decided_at",
+    "applied_at",
+    "updated_at",
+])
+
+
 def get_all_loan_applications() -> list[dict]:
     """PFL dashboard — get all applications, newest first."""
     try:
         res = (
             supabase.table("loan_applications")
-            .select("*")
+            .select(LOAN_APPLICATION_LIST_COLUMNS)
             .order("applied_at", desc=True)
+            .limit(100)
             .execute()
         )
         return res.data or []
@@ -620,9 +653,10 @@ def get_user_loan_applications(user_id: str) -> list[dict]:
     try:
         res = (
             supabase.table("loan_applications")
-            .select("*")
+            .select(LOAN_APPLICATION_LIST_COLUMNS)
             .eq("user_id", to_uuid(user_id))
             .order("applied_at", desc=True)
+            .limit(100)
             .execute()
         )
         return res.data or []
