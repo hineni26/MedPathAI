@@ -17,7 +17,6 @@ SUPPORTED_PROCEDURES = [
     "knee_replacement", "lasik", "mri_scan", "normal_delivery"
 ]
 
-# ── Emergency symptom keywords ─────────────────────────────────────────────────
 EMERGENCY_KEYWORDS = [
     "chest pain", "heart attack", "stroke", "can't breathe",
     "cannot breathe", "difficulty breathing", "severe bleeding",
