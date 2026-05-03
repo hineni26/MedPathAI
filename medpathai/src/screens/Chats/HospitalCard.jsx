@@ -56,8 +56,17 @@ export default function HospitalCard({ hospital, selected, onSelect }) {
         gap: 10,
         marginTop: 14,
       }}>
-        <Metric icon={IndianRupee} label="Cost" value={`${formatINR(hospital.cost_min, true)} - ${formatINR(hospital.cost_max, true)}`} />
-        <Metric icon={Clock} label="Wait" value={`${hospital.waiting_days ?? 'N/A'} days`} />
+        <Metric
+          icon={IndianRupee}
+          label="Cost"
+          value={`${formatINR(hospital.cost_min ?? hospital.cost_result?.total_min, true)} – ${formatINR(hospital.cost_max ?? hospital.cost_result?.total_max, true)}`}
+          estimated={hospital.cost_result?.is_estimated}
+          />
+        <Metric
+         icon={Clock}
+         label="Wait"
+         value={`${hospital.waiting_days ?? hospital.cost_result?.selected_hospital?.waiting_days ?? 'N/A'} days`}
+         />
         <Metric icon={MapPin} label="Distance" value={hospital.distance_km ? `${hospital.distance_km} km` : hospital.city} />
         <Metric icon={ShieldCheck} label="Cashless" value={hospital.cashless_insurance ? 'Available' : 'Check first'} />
       </div>
@@ -80,12 +89,28 @@ export default function HospitalCard({ hospital, selected, onSelect }) {
   )
 }
 
-function Metric({ icon: Icon, label, value }) {
+function Metric({ icon: Icon, label, value, estimated }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       <Icon size={14} color="var(--color-text-muted)" style={{ flexShrink: 0 }} />
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>{label}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>{label}</span>
+          {estimated && (
+            <span style={{
+              fontSize: 10,
+              fontWeight: 600,
+              color: 'var(--teal-600)',
+              background: 'var(--teal-50)',
+              border: '1px solid var(--teal-200)',
+              borderRadius: 4,
+              padding: '0 4px',
+              lineHeight: '14px',
+            }}>
+              AI est.
+            </span>
+          )}
+        </div>
         <div className="truncate" style={{ fontSize: 'var(--text-xs)', fontWeight: 600 }}>{value}</div>
       </div>
     </div>
