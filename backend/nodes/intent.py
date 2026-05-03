@@ -90,6 +90,74 @@ SYMPTOM_TERMS = (
     "teeth", "dental", "gum", "jaw", "ear", "throat", "rash",
 )
 
+ABDOMEN_TERMS = ("abdomen", "abdominal", "stomach", "belly", "appendix")
+
+FALLBACK_QUESTION_RULES = (
+    {
+        "terms": ABDOMEN_TERMS,
+        "stop_after_match": True,
+        "questions": (
+            (
+                ("fever", "nausea", "vomiting", "appetite", "movement"),
+                (
+                    "Do you have fever, nausea, vomiting, loss of appetite, "
+                    "or pain that worsens when you move?"
+                ),
+            ),
+            (
+                ("severity", "scale", "severe"),
+                "How severe is the abdominal pain on a 1 to 10 scale, and is it constant or coming in waves?",
+            ),
+            (
+                ("urine", "stool", "diarrhea", "constipation"),
+                "Have you noticed any diarrhea, constipation, burning urination, or blood in stool or urine?",
+            ),
+        ),
+    },
+    {
+        "terms": ("chest",),
+        "questions": (
+            (
+                ("breathing", "left arm", "sweating", "dizziness"),
+                "Are you having trouble breathing, sweating, dizziness, or pain spreading to your arm, jaw, or back?",
+            ),
+        ),
+    },
+    {
+        "terms": ("headache",),
+        "questions": (
+            (
+                ("vision", "weakness", "vomiting", "sudden"),
+                "Did the headache start suddenly, and do you have vomiting, vision changes, weakness, or confusion?",
+            ),
+        ),
+    },
+    {
+        "terms": ("pain",),
+        "questions": (
+            (
+                ("where", "which part", "location"),
+                "Where exactly is the pain, and does it spread anywhere else?",
+            ),
+            (
+                ("severity", "scale", "mild", "moderate", "severe"),
+                "How severe is the pain on a 1 to 10 scale, and what does it feel like?",
+            ),
+        ),
+    },
+)
+
+GENERAL_FALLBACK_QUESTIONS = (
+    (
+        ("how long", "when did", "started"),
+        "When did this start, and has it been getting better, worse, or staying the same?",
+    ),
+    (
+        ("fever", "vomiting", "breathing", "dizziness"),
+        "Do you have any other symptoms like fever, vomiting, breathing trouble, dizziness, or weakness?",
+    ),
+)
+
 INTENT_PROMPT = """
 You are MedPath's clinical intake AI for hospital navigation in India.
 Use clinical reasoning to understand the user's symptoms and decide whether to ask a follow-up or show hospitals.
@@ -418,50 +486,31 @@ def _has_any(text: str, terms: tuple[str, ...]) -> bool:
     return any(term in text for term in terms)
 
 
+def _first_unasked_question(asked: str, questions: tuple[tuple[tuple[str, ...], str], ...]) -> str | None:
+    for markers, question in questions:
+        if not any(marker in asked for marker in markers):
+            return question
+    return None
+
+
 def _fallback_question(state: dict, procedure: str | None = None) -> str | None:
     text = _combined_user_text(state)
     asked = _history_assistant_text(state)
 
-    def not_asked(*markers: str) -> bool:
-        return not any(marker in asked for marker in markers)
-
     if not _has_any(text, SYMPTOM_TERMS):
-        if not_asked("what symptoms", "what symptom", "experiencing"):
+        if not any(marker in asked for marker in ("what symptoms", "what symptom", "experiencing")):
             return "What symptoms are you having, and how long has this been going on?"
         return "What is the main symptom bothering you right now?"
 
-    abdomen_terms = ("abdomen", "abdominal", "stomach", "belly", "appendix")
-    if _has_any(text, abdomen_terms):
-        if not_asked("fever", "nausea", "vomiting", "appetite", "movement"):
-            return (
-                "Do you have fever, nausea, vomiting, loss of appetite, "
-                "or pain that worsens when you move?"
-            )
-        if not_asked("severity", "scale", "severe"):
-            return "How severe is the abdominal pain on a 1 to 10 scale, and is it constant or coming in waves?"
-        if not_asked("urine", "stool", "diarrhea", "constipation"):
-            return "Have you noticed any diarrhea, constipation, burning urination, or blood in stool or urine?"
-        return None
+    for rule in FALLBACK_QUESTION_RULES:
+        if not _has_any(text, rule["terms"]):
+            continue
 
-    if "chest" in text and not_asked("breathing", "left arm", "sweating", "dizziness"):
-        return "Are you having trouble breathing, sweating, dizziness, or pain spreading to your arm, jaw, or back?"
+        question = _first_unasked_question(asked, rule["questions"])
+        if question or rule.get("stop_after_match"):
+            return question
 
-    if "headache" in text and not_asked("vision", "weakness", "vomiting", "sudden"):
-        return "Did the headache start suddenly, and do you have vomiting, vision changes, weakness, or confusion?"
-
-    if "pain" in text:
-        if not_asked("where", "which part", "location"):
-            return "Where exactly is the pain, and does it spread anywhere else?"
-        if not_asked("severity", "scale", "mild", "moderate", "severe"):
-            return "How severe is the pain on a 1 to 10 scale, and what does it feel like?"
-
-    if not_asked("how long", "when did", "started"):
-        return "When did this start, and has it been getting better, worse, or staying the same?"
-
-    if not_asked("fever", "vomiting", "breathing", "dizziness"):
-        return "Do you have any other symptoms like fever, vomiting, breathing trouble, dizziness, or weakness?"
-
-    return None
+    return _first_unasked_question(asked, GENERAL_FALLBACK_QUESTIONS)
 
 
 def _fallback_route(state: dict) -> dict:
