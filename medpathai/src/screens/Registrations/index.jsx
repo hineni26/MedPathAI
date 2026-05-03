@@ -11,7 +11,7 @@ import { registerUser, getProfile } from '../../api/registration'
 import { saveFinancials } from '../../api/financials'
 import { useUserStore } from '../../store/userStore'
 import { useUIStore } from '../../store/uiStore'
-import { getUserId, markRegistered, isRegistered, setUserId as persistUserId } from '../../api/auth'
+import { getUserId, markRegistered, isRegistered, setAccessToken, setUserId as persistUserId } from '../../api/auth'
 
 const STEPS = [
   { label: 'Profile' },
@@ -131,6 +131,7 @@ export default function Registration() {
       })
 
       const savedUserId = registerResult.user_id || userId
+      setAccessToken(registerResult.access_token)
       if (savedUserId !== userId) {
         persistUserId(savedUserId)
         setStoreUserId(savedUserId)

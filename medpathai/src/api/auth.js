@@ -1,7 +1,12 @@
 import client from './client'
-
-const USER_ID_KEY = 'medpath_user_id'
-const REGISTERED_KEY = 'medpath_registered'
+import {
+  ACCESS_TOKEN_KEY,
+  REGISTERED_KEY,
+  USER_ID_KEY,
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+} from './session'
 
 // Generate a stable userId for this browser.
 // In a real auth system this would come from a login token.
@@ -23,7 +28,7 @@ export function clearUserId() {
 }
 
 export function isRegistered() {
-  return !!localStorage.getItem(REGISTERED_KEY) && !!localStorage.getItem(USER_ID_KEY)
+  return !!localStorage.getItem(REGISTERED_KEY) && !!localStorage.getItem(USER_ID_KEY) && !!getAccessToken()
 }
 
 export function markRegistered() {
@@ -32,7 +37,10 @@ export function markRegistered() {
 
 export function clearRegistration() {
   localStorage.removeItem(REGISTERED_KEY)
+  clearAccessToken()
 }
 
 export const loginUser = (payload) =>
   client.post('/api/login', payload)
+
+export { ACCESS_TOKEN_KEY, clearAccessToken, setAccessToken }

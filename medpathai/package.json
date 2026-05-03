@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:pfl": "vite --config vite.pfl.config.js",
+    "dev": "vite --force",
+    "dev:pfl": "vite --force --config vite.pfl.config.js",
     "build": "vite build",
     "build:pfl": "vite build --config vite.pfl.config.js",
     "lint": "eslint .",

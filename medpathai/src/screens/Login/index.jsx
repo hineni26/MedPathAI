@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { LogIn, ShieldCheck } from 'lucide-react'
-import { loginUser, markRegistered, setUserId } from '../../api/auth'
+import { loginUser, markRegistered, setAccessToken, setUserId } from '../../api/auth'
 import { useUserStore } from '../../store/userStore'
 import { useUIStore } from '../../store/uiStore'
 import { Spinner } from '../../components/ui'
@@ -32,6 +32,7 @@ export default function Login() {
       })
 
       setUserId(data.user_id)
+      setAccessToken(data.access_token)
       setStoreUserId(data.user_id)
       setProfile(data.profile || null)
       setFinancials(data.financials || null)

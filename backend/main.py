@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -27,13 +27,64 @@ from db import (
     save_loan_application, get_loan_application,
     update_loan_status, get_all_loan_applications, get_user_loan_applications,
 )
+from security import create_access_token, require_officer, require_user, verify_access_token
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 gemini = genai.GenerativeModel("gemini-2.5-flash")
 DOCUMENT_EXTRACTION_ENABLED = os.getenv("DOCUMENT_EXTRACTION_ENABLED", "false").lower() == "true"
 DOCUMENT_BUCKET = os.getenv("DOCUMENT_BUCKET", "medical-documents")
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", "5242880"))
+ALLOWED_UPLOAD_MIME_TYPES = {
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+}
+CORS_ALLOW_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOW_ORIGINS",
+        "http://localhost:5173,http://localhost:5174",
+    ).split(",")
+    if origin.strip()
+]
 
 app = FastAPI(title="MedPath AI", version="1.0.0")
+
+
+def assert_same_user(request_user_id: str, authenticated_user_id: str) -> None:
+    if to_uuid(request_user_id) != to_uuid(authenticated_user_id):
+        raise HTTPException(status_code=403, detail="You can only access your own MedPath data")
+
+
+def optional_authenticated_user(authorization: str | None) -> str | None:
+    if not authorization:
+        return None
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header")
+    return verify_access_token(authorization.removeprefix("Bearer ").strip())
+
+
+def safe_filename(filename: str | None) -> str:
+    name = os.path.basename(filename or "document").strip()
+    return name.replace("/", "_").replace("\\", "_") or "document"
+
+
+def validate_upload(file: UploadFile, contents: bytes) -> None:
+    if len(contents) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File is too large")
+    if file.content_type not in ALLOWED_UPLOAD_MIME_TYPES:
+        raise HTTPException(status_code=400, detail="Only PDF, JPG, PNG, and WEBP uploads are allowed")
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(self)"
+    return response
 
 
 def run_direct_procedure_pipeline(
@@ -82,10 +133,10 @@ def run_direct_procedure_pipeline(
 # ── CORS — allow React frontend ────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=CORS_ALLOW_ORIGINS,
+    allow_credentials=False,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "X-PFL-API-Key"],
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -242,7 +293,7 @@ def get_cities():
 # ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/api/register")
-async def register(req: RegisterRequest):
+async def register(req: RegisterRequest, authorization: str | None = Header(default=None)):
     """Save user health profile."""
     profile = req.model_dump()
 
@@ -250,6 +301,11 @@ async def register(req: RegisterRequest):
     request_uuid = to_uuid(req.user_id)
     if existing and existing.get("user_id") != request_uuid:
         raise HTTPException(status_code=409, detail="An account with this email already exists")
+    if existing:
+        authenticated_user_id = optional_authenticated_user(authorization)
+        if not authenticated_user_id:
+            raise HTTPException(status_code=401, detail="Log in before updating this profile")
+        assert_same_user(request_uuid, authenticated_user_id)
 
     profile["email"] = req.email.strip().lower()
     if req.password:
@@ -262,7 +318,12 @@ async def register(req: RegisterRequest):
     success = save_user_profile(req.user_id, profile)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save profile")
-    return {"success": True, "message": "Profile saved successfully", "user_id": request_uuid}
+    return {
+        "success": True,
+        "message": "Profile saved successfully",
+        "user_id": request_uuid,
+        "access_token": create_access_token(request_uuid),
+    }
 
 
 @app.post("/api/login")
@@ -280,6 +341,7 @@ async def login(req: LoginRequest):
     return {
         "success":    True,
         "user_id":    user_id,
+        "access_token": create_access_token(user_id),
         "profile":    profile,
         "financials": financials,
         "documents":  documents,
@@ -287,8 +349,9 @@ async def login(req: LoginRequest):
 
 
 @app.get("/api/profile/{user_id}")
-async def get_profile(user_id: str):
+async def get_profile(user_id: str, current_user_id: str = Depends(require_user)):
     """Get user profile + financials + documents."""
+    assert_same_user(user_id, current_user_id)
     profile    = get_user_profile(user_id)
     financials = get_user_financials(user_id)
     documents  = get_user_documents(user_id)
@@ -307,8 +370,9 @@ async def get_profile(user_id: str):
 # ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/api/financials")
-async def save_financials(req: FinancialsRequest):
+async def save_financials(req: FinancialsRequest, current_user_id: str = Depends(require_user)):
     """Save user financial details manually entered."""
+    assert_same_user(req.user_id, current_user_id)
     financials = req.model_dump()
 
     max_loan      = req.monthly_income * 10
@@ -337,13 +401,16 @@ async def upload_document(
     user_id:  str        = Form(...),
     doc_type: str        = Form(...),
     file:     UploadFile = File(...),
+    current_user_id: str = Depends(require_user),
 ):
     """
     Upload financial document (PDF, JPG, PNG, WEBP).
     Saves to Supabase Storage. Gemini extraction is optional via env flag.
     """
+    assert_same_user(user_id, current_user_id)
     contents = await file.read()
-    original_filename = file.filename or "document"
+    validate_upload(file, contents)
+    original_filename = safe_filename(file.filename)
     doc_type = normalize_doc_type(doc_type)
 
     if doc_type not in ALLOWED_DOC_TYPES:
@@ -516,8 +583,9 @@ async def upload_document(
 
 
 @app.get("/api/documents/{user_id}")
-async def get_documents(user_id: str):
+async def get_documents(user_id: str, current_user_id: str = Depends(require_user)):
     """Get all uploaded documents for a user."""
+    assert_same_user(user_id, current_user_id)
     docs = get_user_documents(user_id)
     return {"documents": docs}
 
@@ -527,14 +595,17 @@ async def replace_document_file(
     user_id: str,
     document_id: str,
     file: UploadFile = File(...),
+    current_user_id: str = Depends(require_user),
 ):
     """Replace the stored file for an uploaded document."""
+    assert_same_user(user_id, current_user_id)
     existing = get_user_document(user_id, document_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Document not found")
 
     contents = await file.read()
-    original_filename = file.filename or "document"
+    validate_upload(file, contents)
+    original_filename = safe_filename(file.filename)
     doc_type = normalize_doc_type(existing.get("doc_type"))
     storage_path = f"{to_uuid(user_id)}/{doc_type}/{uuid.uuid4()}-{original_filename}"
 
@@ -587,8 +658,13 @@ async def replace_document_file(
 
 
 @app.delete("/api/documents/{user_id}/{document_id}")
-async def delete_document(user_id: str, document_id: str):
+async def delete_document(
+    user_id: str,
+    document_id: str,
+    current_user_id: str = Depends(require_user),
+):
     """Delete one uploaded document so the user can replace it later."""
+    assert_same_user(user_id, current_user_id)
     success = delete_user_document(user_id, document_id)
     if not success:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -599,11 +675,12 @@ async def delete_document(user_id: str, document_id: str):
 # ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/api/chat")
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, current_user_id: str = Depends(require_user)):
     """
     Main chat endpoint.
     Runs the full LangGraph pipeline and returns structured response.
     """
+    assert_same_user(req.user_id, current_user_id)
     session_id = req.session_id or str(uuid.uuid4())
 
     profile = get_user_profile(req.user_id)
@@ -614,7 +691,7 @@ async def chat(req: ChatRequest):
         )
 
     financials    = get_user_financials(req.user_id)
-    session_state = get_session(session_id)
+    session_state = get_session(session_id, req.user_id)
     history       = session_state.get("conversation_history", []) if session_state else []
 
     result = run_direct_procedure_pipeline(
@@ -671,7 +748,7 @@ async def chat(req: ChatRequest):
 # ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/api/loan/apply")
-async def apply_loan(req: LoanApplyRequest):
+async def apply_loan(req: LoanApplyRequest, current_user_id: str = Depends(require_user)):
     """
     User confirms loan application.
     1. Runs eligibility check using loan_engine
@@ -679,6 +756,7 @@ async def apply_loan(req: LoanApplyRequest):
     3. Returns result so frontend can show offer or alternatives
     """
     from loan_engine import run_eligibility, build_application_package
+    assert_same_user(req.user_id, current_user_id)
 
     profile    = get_user_profile(req.user_id)
     financials = get_user_financials(req.user_id)
@@ -717,7 +795,7 @@ async def apply_loan(req: LoanApplyRequest):
         }
 
     # ── Step 3: Get hospital + procedure from session ─────────────────────────
-    session_state = get_session(req.session_id) or {}
+    session_state = get_session(req.session_id, req.user_id) or {}
     hospitals     = session_state.get("last_hospitals", [])
     procedure     = session_state.get("last_procedure", "Medical procedure")
     selected      = None
@@ -771,7 +849,7 @@ async def apply_loan(req: LoanApplyRequest):
 
 
 @app.get("/api/loan/status/{reference_id}")
-async def loan_status(reference_id: str):
+async def loan_status(reference_id: str, current_user_id: str = Depends(require_user)):
     """
     Patient polls this every 3 seconds after submitting.
     Returns current status: PENDING / APPROVED / REJECTED
@@ -779,6 +857,7 @@ async def loan_status(reference_id: str):
     application = get_loan_application(reference_id)
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
+    assert_same_user(application.get("user_id"), current_user_id)
 
     return {
         "reference_id":  application["reference_id"],
@@ -794,8 +873,9 @@ async def loan_status(reference_id: str):
 
 
 @app.get("/api/loan/applications/{user_id}")
-async def user_loan_applications(user_id: str):
+async def user_loan_applications(user_id: str, current_user_id: str = Depends(require_user)):
     """Patient loan history - returns only applications owned by this user."""
+    assert_same_user(user_id, current_user_id)
     applications = get_user_loan_applications(user_id)
     return {"applications": applications}
 
@@ -805,6 +885,7 @@ async def pfl_decide(
     reference_id: str,
     decision:     str,
     officer_note: str = "",
+    _: None = Depends(require_officer),
 ):
     """
     PFL officer approves or rejects from the dashboard.
@@ -821,7 +902,7 @@ async def pfl_decide(
 
 
 @app.get("/api/pfl/applications")
-async def pfl_applications():
+async def pfl_applications(_: None = Depends(require_officer)):
     """
     PFL officer dashboard — returns all applications newest first.
     The React PFL dashboard polls this endpoint every 3 seconds.
