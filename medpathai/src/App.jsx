@@ -5,11 +5,17 @@ import Login from './screens/Login'
 import Documents from './screens/Documents'
 import Chat from './screens/Chats'
 import LoanHistory from './screens/LoanHistory'
+import PFLDashboard from './screens/PFLDashboard'
 import { isRegistered } from './api/auth'
+import { getOfficerToken } from './api/session'
 
 // Guard: redirect to /login if not authenticated
 function RequireProfile({ children }) {
   return isRegistered() ? children : <Navigate to="/login" replace />
+}
+
+function RequireOfficer({ children }) {
+  return getOfficerToken() ? children : <Navigate to="/login" replace />
 }
 
 export default function App() {
@@ -30,6 +36,10 @@ export default function App() {
           <Route
             path="/loans"
             element={<RequireProfile><LoanHistory /></RequireProfile>}
+          />
+          <Route
+            path="/admin"
+            element={<RequireOfficer><PFLDashboard /></RequireOfficer>}
           />
           <Route path="*" element={<Navigate to={isRegistered() ? '/chat' : '/login'} replace />} />
         </Route>

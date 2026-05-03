@@ -28,11 +28,12 @@ def _sign(message: str) -> str:
     return _b64url_encode(digest)
 
 
-def create_access_token(user_id: str) -> str:
+def create_access_token(user_id: str, role: str = "user") -> str:
     now = int(time.time())
     header = {"alg": "HS256", "typ": "JWT"}
     payload = {
         "sub": str(user_id),
+        "role": role,
         "iat": now,
         "exp": now + JWT_TTL_SECONDS,
     }
@@ -42,7 +43,7 @@ def create_access_token(user_id: str) -> str:
     return f"{signing_input}.{_sign(signing_input)}"
 
 
-def verify_access_token(token: str) -> str:
+def verify_access_payload(token: str) -> dict:
     try:
         encoded_header, encoded_payload, signature = token.split(".", 2)
         signing_input = f"{encoded_header}.{encoded_payload}"
@@ -56,22 +57,37 @@ def verify_access_token(token: str) -> str:
         if int(payload.get("exp", 0)) < int(time.time()):
             raise ValueError("expired")
 
-        user_id = payload.get("sub")
-        if not user_id:
+        if not payload.get("sub"):
             raise ValueError("missing subject")
-        return str(user_id)
+        return payload
     except Exception as exc:
         raise HTTPException(status_code=401, detail="Invalid or expired session") from exc
+
+
+def verify_access_token(token: str) -> str:
+    payload = verify_access_payload(token)
+    return str(payload["sub"])
 
 
 def require_user(authorization: Optional[str] = Header(default=None)) -> str:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Authentication required")
-    return verify_access_token(authorization.removeprefix("Bearer ").strip())
+    payload = verify_access_payload(authorization.removeprefix("Bearer ").strip())
+    if payload.get("role", "user") != "user":
+        raise HTTPException(status_code=403, detail="Patient authentication required")
+    return str(payload["sub"])
 
 
-def require_officer(x_pfl_api_key: Optional[str] = Header(default=None)) -> None:
-    if not PFL_OFFICER_API_KEY:
-        raise HTTPException(status_code=503, detail="PFL officer API key is not configured")
-    if not x_pfl_api_key or not hmac.compare_digest(x_pfl_api_key, PFL_OFFICER_API_KEY):
-        raise HTTPException(status_code=401, detail="PFL officer authentication required")
+def require_officer(
+    authorization: Optional[str] = Header(default=None),
+    x_pfl_api_key: Optional[str] = Header(default=None),
+) -> None:
+    if PFL_OFFICER_API_KEY and x_pfl_api_key and hmac.compare_digest(x_pfl_api_key, PFL_OFFICER_API_KEY):
+        return
+
+    if authorization and authorization.startswith("Bearer "):
+        payload = verify_access_payload(authorization.removeprefix("Bearer ").strip())
+        if payload.get("role") == "officer":
+            return
+
+    raise HTTPException(status_code=401, detail="PFL officer authentication required")
