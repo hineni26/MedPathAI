@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { LogIn, ShieldCheck } from 'lucide-react'
+import { LogIn, ShieldCheck, UserCog } from 'lucide-react'
 import { loginUser, markRegistered, setAccessToken, setUserId } from '../../api/auth'
+import { loginOfficer } from '../../api/pfl'
+import { setOfficerToken } from '../../api/session'
 import { useUserStore } from '../../store/userStore'
 import { useUIStore } from '../../store/uiStore'
 import { Spinner } from '../../components/ui'
@@ -15,6 +17,7 @@ export default function Login() {
   const setDocuments = useUserStore((s) => s.setDocuments)
 
   const [form, setForm] = useState({ email: '', password: '' })
+  const [mode, setMode] = useState('patient')
   const [loading, setLoading] = useState(false)
 
   function update(key, value) {
@@ -26,6 +29,18 @@ export default function Login() {
     setLoading(true)
 
     try {
+      if (mode === 'admin') {
+        const data = await loginOfficer({
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+        })
+
+        setOfficerToken(data.access_token)
+        toast('Administrator login successful', 'success')
+        navigate('/admin')
+        return
+      }
+
       const data = await loginUser({
         email: form.email.trim().toLowerCase(),
         password: form.password,
@@ -64,6 +79,28 @@ export default function Login() {
       </div>
 
       <form className="card" style={{ padding: 'var(--space-8)' }} onSubmit={handleSubmit}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 8,
+          marginBottom: 'var(--space-6)',
+        }}>
+          <button
+            type="button"
+            className={`btn ${mode === 'patient' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setMode('patient')}
+          >
+            <LogIn size={16} /> Patient
+          </button>
+          <button
+            type="button"
+            className={`btn ${mode === 'admin' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setMode('admin')}
+          >
+            <UserCog size={16} /> Administrator
+          </button>
+        </div>
+
         <div style={{ marginBottom: 'var(--space-5)' }}>
           <label className="form-label">Email</label>
           <input
@@ -101,17 +138,25 @@ export default function Login() {
         }}>
           <ShieldCheck size={15} color="var(--teal-700)" style={{ flexShrink: 0, marginTop: 1 }} />
           <p style={{ fontSize: 'var(--text-xs)', color: 'var(--teal-800)' }}>
-            Passwords are checked using a salted one-way hash. Your raw password is never stored.
+            {mode === 'admin'
+              ? 'Administrator credentials open the PFL officer dashboard for reviewing loan applications.'
+              : 'Passwords are checked using a salted one-way hash. Your raw password is never stored.'}
           </p>
         </div>
 
         <button className="btn btn-primary btn-lg" disabled={loading} style={{ width: '100%' }}>
-          {loading ? <><Spinner size={16} color="#fff" /> Logging in...</> : <><LogIn size={17} /> Log in</>}
+          {loading
+            ? <><Spinner size={16} color="#fff" /> Logging in...</>
+            : mode === 'admin'
+              ? <><UserCog size={17} /> Login as administrator</>
+              : <><LogIn size={17} /> Log in</>}
         </button>
 
-        <p style={{ marginTop: 'var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
-          New here? <Link to="/register">Create your profile</Link>
-        </p>
+        {mode === 'patient' && (
+          <p style={{ marginTop: 'var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+            New here? <Link to="/register">Create your profile</Link>
+          </p>
+        )}
       </form>
     </div>
   )

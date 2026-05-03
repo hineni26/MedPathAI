@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import hmac
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -190,6 +191,10 @@ class LoginRequest(BaseModel):
     email:    str
     password: str
 
+class OfficerLoginRequest(BaseModel):
+    email:    str
+    password: str
+
 
 DOC_VALIDATION_RULES = {
     "salary_slip": {
@@ -349,6 +354,27 @@ async def login(req: LoginRequest):
         "profile":    profile,
         "financials": financials,
         "documents":  documents,
+    }
+
+
+@app.post("/api/pfl/login")
+async def pfl_login(req: OfficerLoginRequest):
+    """Authenticate a PFL officer/admin for the loan review dashboard."""
+    officer_email = os.getenv("PFL_OFFICER_EMAIL") or os.getenv("ADMIN_EMAIL")
+    officer_password = os.getenv("PFL_OFFICER_PASSWORD") or os.getenv("ADMIN_PASSWORD")
+
+    if not officer_email or not officer_password:
+        raise HTTPException(status_code=503, detail="PFL officer login is not configured")
+
+    email_ok = hmac.compare_digest(req.email.strip().lower(), officer_email.strip().lower())
+    password_ok = hmac.compare_digest(req.password, officer_password)
+    if not email_ok or not password_ok:
+        raise HTTPException(status_code=401, detail="Invalid administrator credentials")
+
+    return {
+        "success": True,
+        "officer": {"email": officer_email.strip().lower(), "role": "officer"},
+        "access_token": create_access_token(officer_email.strip().lower(), role="officer"),
     }
 
 

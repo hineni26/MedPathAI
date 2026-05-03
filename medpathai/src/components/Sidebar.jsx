@@ -1,7 +1,8 @@
 import { NavLink, useNavigate } from 'react-router'
-import { UserCircle, FileText, MessageCircle, Activity, LogOut, LogIn, Moon, Sun, ReceiptText } from 'lucide-react'
+import { UserCircle, FileText, MessageCircle, Activity, LogOut, LogIn, Moon, Sun, ReceiptText, UserCog } from 'lucide-react'
 import { useUserStore } from '../store/userStore'
 import { clearUserId, clearRegistration, isRegistered } from '../api/auth'
+import { clearOfficerToken, getOfficerToken } from '../api/session'
 import { useChatStore } from '../store/chatStore'
 import { useUIStore } from '../store/uiStore'
 
@@ -11,6 +12,7 @@ const NAV = [
   { to: '/documents',icon: FileText,      label: 'Documents', end: false },
   { to: '/chat',     icon: MessageCircle, label: 'Chat',      end: false },
   { to: '/loans',    icon: ReceiptText,   label: 'Loan History', end: false },
+  { to: '/admin',    icon: UserCog,       label: 'PFL Admin', end: false },
 ]
 
 export default function Sidebar() {
@@ -21,11 +23,13 @@ export default function Sidebar() {
   const theme = useUIStore((s) => s.theme)
   const toggleTheme = useUIStore((s) => s.toggleTheme)
   const loggedIn = isRegistered()
+  const officerLoggedIn = !!getOfficerToken()
   const isDark = theme === 'dark'
 
   function handleLogout() {
     clearUserId()
     clearRegistration()
+    clearOfficerToken()
     clearUser()
     clearChat()
     navigate('/login')
@@ -87,7 +91,10 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav style={{ padding: '8px 12px', flex: 1 }}>
-        {NAV.filter((item) => loggedIn || item.to === '/login' || item.to === '/register').map(({ to, icon: Icon, label, end }) => (
+        {NAV.filter((item) => {
+          if (item.to === '/admin') return officerLoggedIn
+          return loggedIn || item.to === '/login' || item.to === '/register'
+        }).map(({ to, icon: Icon, label, end }) => (
           <NavLink
             key={to}
             to={to}

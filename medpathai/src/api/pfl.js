@@ -1,5 +1,9 @@
 import client from './client'
 
+export function loginOfficer(payload) {
+  return client.post('/api/pfl/login', payload)
+}
+
 export function getPFLApplications() {
   return client.get('/api/pfl/applications')
 }
