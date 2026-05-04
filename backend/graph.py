@@ -186,7 +186,7 @@ def build_graph():
 
 # ── Compiled graph (import this in main.py) ────────────────────────────────────
 graph = build_graph()
-print("✅ LangGraph compiled successfully")
+print("LangGraph compiled successfully")
 
 
 # ── Helper: run full pipeline ──────────────────────────────────────────────────

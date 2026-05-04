@@ -1,9 +1,63 @@
+# Environment variables
 .env
-medpathai/.env
-myVenv
-medpathai/node_modules
-backend/__pycache__
-backend/nodes/__pycache__
-*.pyc
+.env.local
+.env.*.local
+
+# Virtual environments
+venv/
+env/
+ENV/
 MedPathAi_env/
+myVenv/
+.venv
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PIPFILE.lock
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
 *.log
+logs/
+
+# IDE and editor files
+.vscode/
+.vscode/settings.json
+.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+
+# Misc
+.DS_Store
+Thumbs.db
+.cache/
