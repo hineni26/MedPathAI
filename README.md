@@ -232,7 +232,7 @@ The `security.py` module provides:
 ## How It Works
 
 1. Register with your health profile, comorbidities, insurance details, and financials
-2. Upload financial documents — salary slip, ITR, CIBIL report (Gemini extracts the data automatically)
+2. Upload financial documents — salary slip, ITR, CIBIL report (Gemini extraction has been developed but not yet implemented)
 3. Open the chat and describe your symptoms or the procedure you need
 4. The AI asks up to **3 targeted clarifying questions** — then commits to a recommendation
 5. Get a ranked list of hospitals in your city with personalised cost breakdowns
@@ -244,7 +244,7 @@ The `security.py` module provides:
 
 ## ML Scoring Pipeline
 
-Every argument — sorry, every *argument* in the chat — runs through four stages in the LangGraph pipeline:
+Every argument runs through four stages in the LangGraph pipeline:
 
 | Node | Model / Engine | Role |
 |---|---|---|
