@@ -33,7 +33,7 @@ hospitals_df["city_lower"]      = hospitals_df["city"].str.lower().str.strip()
 cities_df["city_lower"]         = cities_df["city"].str.lower().str.strip()
 procedures_df["procedure_name"] = procedures_df["procedure_name"].str.lower().str.strip()
 
-print(f"✅ Loaded {len(hospitals_df)} hospitals, "
+print(f"Loaded {len(hospitals_df)} hospitals, "
       f"{len(procedures_df)} procedures, "
       f"{len(cities_df)} cities from Supabase")
 
