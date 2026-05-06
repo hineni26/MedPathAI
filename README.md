@@ -126,7 +126,7 @@ PFL_OFFICER_API_KEY=<optional-api-key-for-officer-dashboard>
 ```
 
 ### 4. Frontend — environment variables
-Create a `.env.local` file inside `medpathai/` (or copy from `.env.example`):
+Create a `.env` file inside `medpathai/` (or copy from `.env.example`):
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 VITE_SUPABASE_URL=https://<your-project>.supabase.co
