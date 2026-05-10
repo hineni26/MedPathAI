@@ -126,7 +126,11 @@ PFL_OFFICER_API_KEY=<optional-api-key-for-officer-dashboard>
 PFL_OFFICER_EMAIL=admin@medpath.ai
 PFL_OFFICER_PASSWORD=MedPathAdmin!2026
 ```
-
+To access the PFL dahsboard, login as administrator with the following credentials:
+`/`/`/bash
+email: admin@medpath.ai
+password:MedPathAdmin!2026
+`/`/`/
 ### 4. Frontend — environment variables
 Create a `.env.local` file inside `medpathai/` (or copy from `.env.example`):
 ```env
