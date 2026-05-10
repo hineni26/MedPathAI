@@ -131,6 +131,8 @@ Create a `.env.local` file inside `medpathai/` (or copy from `.env.example`):
 VITE_API_BASE_URL=http://localhost:8000
 VITE_SUPABASE_URL=https://<your-project>.supabase.co
 VITE_SUPABASE_ANON_KEY=<your-anon-key>
+PFL_OFFICER_EMAIL=admin@medpath.ai
+PFL_OFFICER_PASSWORD=MedPathAdmin!2026
 ```
 
 ### 5. Run the backend
